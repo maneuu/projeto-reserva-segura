@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minhas Reservas</title>
+  <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}">
+</head>
+
+<body>
+  <main class="auth-card" style="max-width: 760px;">
+    <h1 class="auth-title">Minhas reservas</h1>
+    <p class="auth-subtitle">Reservas vinculadas ao seu usuário.</p>
+
+    {% if reservations %}
+    <ul class="reservation-list">
+      {% for reservation in reservations %}
+      <li class="reservation-item">
+        <strong>{{ reservation.room.name }}</strong>
+        <div class="reservation-meta">
+          {{ reservation.start_datetime|date:"d/m/Y H:i" }} até {{ reservation.end_datetime|date:"d/m/Y H:i" }}
+        </div>
+        {% if reservation.description %}
+        <div class="reservation-meta">{{ reservation.description }}</div>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="reservation-meta">Você ainda não possui reservas cadastradas.</p>
+    {% endif %}
+
+    <p class="auth-footer">
+      <a href="{% url 'home' %}">Voltar para a home</a>
+    </p>
+  </main>
+</body>
+
+</html>

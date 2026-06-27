@@ -1,27 +1,96 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
   <meta charset="UTF-8">
-  <title>Salas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salas | Reserva Segura</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="{% static 'rooms/css/room_list.css' %}">
 </head>
 
 <body>
+  <main class="rooms-page">
+    <header class="rooms-header">
+      <div>
+        <p class="eyebrow">Painel acadêmico</p>
+        <h1>Salas cadastradas</h1>
+        <p class="subtitle">Busque por nome, filtre por status e inicie reservas sem conflito.</p>
+      </div>
+      <a href="{% url 'home' %}" class="btn btn-secondary">Voltar para home</a>
+    </header>
 
-  <h1>Lista de Salas</h1>
+    <section class="filters-panel">
+      <form method="get" class="filters-form">
+        <div class="field-group">
+          <label for="search">Buscar sala</label>
+          <div class="input-icon">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input id="search" type="text" name="search" value="{{ search }}" placeholder="Ex.: Laboratório de Redes">
+          </div>
+        </div>
 
-  <ul>
-    {% for room in rooms %}
-    <li>
-      <strong>{{ room.name }}</strong> -
-      {{ room.location }} -
-      Capacidade: {{ room.capacity }}
-    </li>
-    {% empty %}
-    <li>Nenhuma sala cadastrada</li>
-    {% endfor %}
-  </ul>
+        <div class="field-group">
+          <label for="status">Disponibilidade</label>
+          <select id="status" name="status">
+            <option value="all" {% if status_all %}selected{% endif %}>Todas as salas</option>
+            <option value="available" {% if status_available %}selected{% endif %}>Apenas disponíveis</option>
+            <option value="unavailable" {% if status_unavailable %}selected{% endif %}>Apenas indisponíveis</option>
+          </select>
+        </div>
 
+        <button type="submit" class="btn btn-primary">Aplicar filtros</button>
+      </form>
+    </section>
+
+    <section class="rooms-grid">
+      {% for item in room_cards %}
+      <article class="room-card">
+        <div class="room-card-top">
+          <div>
+            <h2>{{ item.room.name }}</h2>
+            <p class="room-location"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ item.room.location }}</p>
+          </div>
+          {% if item.is_available %}
+          <span class="status-badge status-available">Disponível</span>
+          {% else %}
+          <span class="status-badge status-unavailable">Indisponível</span>
+          {% endif %}
+        </div>
+
+        <div class="room-meta">
+          <p><strong>Capacidade:</strong> {{ item.room.capacity }} pessoas</p>
+          <p><strong>Recursos:</strong>
+            {% if item.room.resources %}
+            {{ item.room.resources|truncatechars:100 }}
+            {% else %}
+            Não informado.
+            {% endif %}
+          </p>
+        </div>
+
+        <div class="room-actions">
+          <a href="{% url 'rooms:room_detail' item.room.id %}" class="btn btn-secondary">Ver detalhes</a>
+
+          {% if item.is_available %}
+          <a href="{% url 'reservations:reservation_create' %}?room={{ item.room.id }}" class="btn btn-primary">Reservar sala</a>
+          {% else %}
+          <button class="btn btn-disabled" type="button" disabled>Indisponível no momento</button>
+          {% endif %}
+        </div>
+      </article>
+      {% empty %}
+      <div class="empty-state">
+        <h3>Nenhuma sala encontrada</h3>
+        <p>Tente alterar os filtros de busca para visualizar outros resultados.</p>
+      </div>
+      {% endfor %}
+    </section>
+  </main>
 </body>
 
 </html>

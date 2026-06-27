@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ room.name }} | Detalhes da Sala</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'rooms/css/room_list.css' %}">
+</head>
+
+<body>
+  <main class="rooms-page">
+    <header class="rooms-header">
+      <div>
+        <p class="eyebrow">Detalhes da sala</p>
+        <h1>{{ room.name }}</h1>
+        <p class="subtitle">Verifique informações e inicie uma reserva segura.</p>
+      </div>
+      <a href="{% url 'rooms:room_list' %}" class="btn btn-secondary">Voltar para salas</a>
+    </header>
+
+    <section class="room-detail-card">
+      <div class="room-detail-grid">
+        <div>
+          <p><strong>Localização:</strong> {{ room.location }}</p>
+          <p><strong>Capacidade:</strong> {{ room.capacity }} pessoas</p>
+          <p><strong>Recursos:</strong>
+            {% if room.resources %}
+            {{ room.resources }}
+            {% else %}
+            Não informado.
+            {% endif %}
+          </p>
+          <p><strong>Descrição:</strong>
+            {% if room.description %}
+            {{ room.description }}
+            {% else %}
+            Sem descrição adicional.
+            {% endif %}
+          </p>
+        </div>
+        <div class="room-status-panel">
+          {% if is_available %}
+          <span class="status-badge status-available">Disponível agora</span>
+          <p>Esta sala está livre no momento atual.</p>
+          <a href="{% url 'reservations:reservation_create' %}?room={{ room.id }}" class="btn btn-primary">Reservar sala</a>
+          {% else %}
+          <span class="status-badge status-unavailable">Indisponível agora</span>
+          <p>Existe uma reserva ativa para esta sala neste momento.</p>
+          <button class="btn btn-disabled" type="button" disabled>Indisponível no momento</button>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+
+</html>

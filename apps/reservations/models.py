@@ -62,6 +62,6 @@ class Reservation(models.Model):
     def __str__(self):
         return (
             f"{self.room.name} | "
-            f"{self.user.get_full_name() or self.user.username} | "
+            f"{self.user.get_full_name() or self.user.email} | "
             f"{self.start_datetime:%d/%m/%Y %H:%M}"
         )

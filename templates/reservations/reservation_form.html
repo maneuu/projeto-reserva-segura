@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova Reserva</title>
+  <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}">
+</head>
+
+<body>
+  <main class="auth-card" style="max-width: 760px;">
+    <h1 class="auth-title">Nova reserva</h1>
+    <p class="auth-subtitle">Preencha os dados para reservar uma sala sem conflito de horário.</p>
+
+    {% if messages %}
+    {% for message in messages %}
+    <p class="auth-subtitle" style="color: #1f7a1f;">{{ message }}</p>
+    {% endfor %}
+    {% endif %}
+
+    {% if form.non_field_errors %}
+    <div class="errorlist nonfield">
+      {% for error in form.non_field_errors %}
+      <p>{{ error }}</p>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" class="auth-form">
+      {% csrf_token %}
+
+      <div>
+        <label for="id_room">Sala</label>
+        {{ form.room }}
+      </div>
+
+      <div>
+        <label for="id_start_datetime">Início</label>
+        {{ form.start_datetime }}
+        {% if form.start_datetime.errors %}
+        <div class="errorlist">{{ form.start_datetime.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div>
+        <label for="id_end_datetime">Término</label>
+        {{ form.end_datetime }}
+        {% if form.end_datetime.errors %}
+        <div class="errorlist">{{ form.end_datetime.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div>
+        <label for="id_description">Descrição</label>
+        {{ form.description }}
+      </div>
+
+      <button type="submit" class="btn-primary">Confirmar reserva</button>
+    </form>
+
+    <p class="auth-footer">
+      <a href="{% url 'rooms:room_list' %}">Voltar para salas</a>
+    </p>
+  </main>
+</body>
+
+</html>

@@ -7,33 +7,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistema de Reserva de Salas</title>
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
-
   <script src="{% static 'home/js/home.js' %}" defer></script>
 </head>
 
 <body>
   <main class="dashboard-container">
+
     <header class="dashboard-header">
-      <h1>Sistema de Reserva de Salas</h1>
-      <p>Sistema para gerenciamento e reserva de salas em ambiente acadêmico</p>
+      <div class="header-titles">
+        <h1>Sistema de Reserva de Salas</h1>
+        <p>Gerenciamento de espaços acadêmicos - Sistemas para Internet</p>
+      </div>
+
+      <div class="header-auth">
+        {% if request.user.is_authenticated %}
+        <div class="user-profile">
+          <i class="fa-solid fa-circle-user" aria-hidden="true"></i>
+
+          <span class="user-name">{{ request.user.first_name|default:request.user.email }}</span>
+
+          <a href="{% url 'accounts:logout' %}" class="btn-icon" title="Sair">
+            <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+          </a>
+        </div>
+        {% else %}
+        <a href="{% url 'accounts:login' %}" class="btn-login">
+          <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
+          Entrar
+        </a>
+        {% endif %}
+      </div>
     </header>
 
     <nav class="action-cards">
-      <a href="/rooms/" class="card animate-card">
+      <a href="{% url 'rooms:room_list' %}" class="card animate-card">
+        <span class="card-icon" aria-hidden="true"><i class="fa-solid fa-building-columns"></i></span>
         <span class="card-title">Ver Salas</span>
         <span class="card-desc">Consulte a disponibilidade de salas no campus.</span>
       </a>
 
-      <a href="/reservations/" class="card animate-card">
+      {% if request.user.is_authenticated %}
+      <a href="{% url 'reservations:reservation_list' %}" class="card animate-card">
+        <span class="card-icon" aria-hidden="true"><i class="fa-solid fa-calendar-check"></i></span>
         <span class="card-title">Minhas Reservas</span>
         <span class="card-desc">Acompanhe e gerencie seus agendamentos.</span>
       </a>
+      {% endif %}
 
-      <a href="/admin/" class="card animate-card">
+      {% if request.user.is_staff %}
+      <a href="{% url 'admin:index' %}" class="card animate-card">
+        <span class="card-icon" aria-hidden="true"><i class="fa-solid fa-gear"></i></span>
         <span class="card-title">Administração</span>
-        <span class="card-desc">Acesso restrito para gestão de usuários e recursos do sistema.</span>
+        <span class="card-desc">Gestão de usuários, salas e configurações.</span>
       </a>
+      {% endif %}
     </nav>
   </main>
 </body>
