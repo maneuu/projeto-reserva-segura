@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Salas</title>
+</head>
+
+<body>
+
+  <h1>Lista de Salas</h1>
+
+  <ul>
+    {% for room in rooms %}
+    <li>
+      <strong>{{ room.name }}</strong> -
+      {{ room.location }} -
+      Capacidade: {{ room.capacity }}
+    </li>
+    {% empty %}
+    <li>Nenhuma sala cadastrada</li>
+    {% endfor %}
+  </ul>
+
+</body>
+
+</html>

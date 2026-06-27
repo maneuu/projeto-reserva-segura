@@ -1,0 +1,117 @@
+/* Definição de paleta de cores neutras e variáveis globais */
+:root {
+  --color-primary: #0056b3;
+  --color-primary-hover: #004494;
+  --color-bg-body: #f4f6f9;
+  --color-bg-container: #ffffff;
+  --color-text-main: #333333;
+  --color-text-muted: #6c757d;
+  --color-border: #e9ecef;
+  --shadow-default: 0 8px 24px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 12px 24px rgba(0, 86, 179, 0.15);
+}
+
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Centralização vertical e horizontal da página */
+body {
+  background-color: var(--color-bg-body);
+  color: var(--color-text-main);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+/* Layout central estilo Dashboard */
+.dashboard-container {
+  background-color: var(--color-bg-container);
+  border-radius: 12px;
+  box-shadow: var(--shadow-default);
+  padding: 3rem 2rem;
+  max-width: 900px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Cabeçalho */
+.dashboard-header {
+  margin-bottom: 3.5rem;
+}
+
+.dashboard-header h1 {
+  color: var(--color-primary);
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-header p {
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+}
+
+/* Grid responsivo para os cards */
+.action-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Estilo individual dos Cards */
+.card {
+  background-color: var(--color-bg-container);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 2rem 1.5rem;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Efeito Hover suave */
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--color-primary);
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 0.75rem;
+}
+
+.card-desc {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+/* Classes preparadas para a animação via JavaScript */
+.animate-card {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
+}
+
+/* Classe injetada pelo JS */
+.animate-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}

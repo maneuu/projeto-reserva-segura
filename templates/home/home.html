@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Reserva de Salas</title>
+
+  <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
+
+  <script src="{% static 'home/js/home.js' %}" defer></script>
+</head>
+
+<body>
+  <main class="dashboard-container">
+    <header class="dashboard-header">
+      <h1>Sistema de Reserva de Salas</h1>
+      <p>Sistema para gerenciamento e reserva de salas em ambiente acadêmico</p>
+    </header>
+
+    <nav class="action-cards">
+      <a href="/rooms/" class="card animate-card">
+        <span class="card-title">Ver Salas</span>
+        <span class="card-desc">Consulte a disponibilidade de salas no campus.</span>
+      </a>
+
+      <a href="/reservations/" class="card animate-card">
+        <span class="card-title">Minhas Reservas</span>
+        <span class="card-desc">Acompanhe e gerencie seus agendamentos.</span>
+      </a>
+
+      <a href="/admin/" class="card animate-card">
+        <span class="card-title">Administração</span>
+        <span class="card-desc">Acesso restrito para gestão de usuários e recursos do sistema.</span>
+      </a>
+    </nav>
+  </main>
+</body>
+
+</html>
