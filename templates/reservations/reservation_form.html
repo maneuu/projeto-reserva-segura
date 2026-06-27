@@ -10,60 +10,150 @@
 </head>
 
 <body>
-  <main class="auth-card" style="max-width: 760px;">
-    <h1 class="auth-title">Nova reserva</h1>
-    <p class="auth-subtitle">Preencha os dados para reservar uma sala sem conflito de horário.</p>
+  <main class="auth-card wide">
+    <div class="page-header">
+      <div>
+        <h1 class="auth-title">Nova reserva</h1>
+        {% if selected_room %}
+        <p class="auth-subtitle">Reservando a sala <strong>{{ selected_room.name }}</strong>.</p>
+        {% else %}
+        <p class="auth-subtitle">Preencha os dados para reservar uma sala.</p>
+        {% endif %}
+      </div>
+
+      <nav class="page-links" aria-label="Navegação">
+        <a class="page-link" href="{% url 'home' %}">Home</a>
+        <a class="page-link" href="{% url 'reservations:reservation_list' %}">Minhas reservas</a>
+        <a class="page-link" href="{% url 'rooms:room_list' %}">Salas</a>
+      </nav>
+    </div>
 
     {% if messages %}
     {% for message in messages %}
-    <p class="auth-subtitle" style="color: #1f7a1f;">{{ message }}</p>
+    <div class="info-banner">{{ message }}</div>
     {% endfor %}
     {% endif %}
 
-    {% if form.non_field_errors %}
-    <div class="errorlist nonfield">
-      {% for error in form.non_field_errors %}
-      <p>{{ error }}</p>
-      {% endfor %}
-    </div>
-    {% endif %}
-
-    <form method="post" class="auth-form">
+    <form method="post" class="auth-form" novalidate>
       {% csrf_token %}
 
-      <div>
+      {% if form.errors %}
+      <div class="form-error-block" role="alert">
+        <span class="form-error-icon">&#9888;</span>
+        <div>
+          <strong>Corrija os itens abaixo para continuar:</strong>
+          <ul class="error-list">
+            {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+            {% for field in form %}
+            {% for error in field.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if selected_room %}
+      <div class="field-group">
+        <label>Sala</label>
+        <div class="input-control input-readonly" aria-readonly="true">
+          {{ selected_room.name }}
+        </div>
+        <input type="hidden" name="room" value="{{ selected_room.pk }}">
+      </div>
+      {% else %}
+      <div class="field-group">
         <label for="id_room">Sala</label>
         {{ form.room }}
       </div>
+      {% endif %}
 
-      <div>
+      <div class="field-group">
         <label for="id_start_datetime">Início</label>
+        <p class="field-hint">Selecione a data e o horário de início. Intervalos de 5 em 5 minutos.</p>
         {{ form.start_datetime }}
-        {% if form.start_datetime.errors %}
-        <div class="errorlist">{{ form.start_datetime.errors }}</div>
-        {% endif %}
       </div>
 
-      <div>
+      <div class="field-group">
         <label for="id_end_datetime">Término</label>
+        <p class="field-hint">Precisa ser depois do horário de início.</p>
         {{ form.end_datetime }}
-        {% if form.end_datetime.errors %}
-        <div class="errorlist">{{ form.end_datetime.errors }}</div>
-        {% endif %}
       </div>
 
-      <div>
-        <label for="id_description">Descrição</label>
+      <div class="field-group">
+        <label for="id_description">Descrição <span class="field-optional">(opcional)</span></label>
         {{ form.description }}
       </div>
 
-      <button type="submit" class="btn-primary">Confirmar reserva</button>
+      <button type="submit" class="submit-btn">Confirmar reserva</button>
     </form>
 
+    {% if room_schedule %}
+    <hr class="section-divider">
+    <h2 class="section-title">Horários já reservados nesta sala</h2>
+    <p class="auth-subtitle">Escolha um período que não conflite com os horários abaixo.</p>
+    <ul class="reservation-list">
+      {% for reservation in room_schedule %}
+      <li class="reservation-item">
+        <strong>{{ reservation.start_datetime|date:"d/m/Y H:i" }} até {{ reservation.end_datetime|date:"H:i" }}</strong>
+        <div class="reservation-meta">Reservado por: {{ reservation.user.get_full_name|default:reservation.user.email }}</div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
     <p class="auth-footer">
-      <a href="{% url 'rooms:room_list' %}">Voltar para salas</a>
+      <a href="{% url 'reservations:reservation_list' %}">Minhas reservas</a>
     </p>
   </main>
+
+  <script>
+    (function () {
+      function pad(n) { return String(n).padStart(2, '0'); }
+
+      function localDatetimeValue(date) {
+        return date.getFullYear() + '-' +
+          pad(date.getMonth() + 1) + '-' +
+          pad(date.getDate()) + 'T' +
+          pad(date.getHours()) + ':' +
+          pad(date.getMinutes());
+      }
+
+      function roundUpToStep(date, stepMinutes) {
+        var ms = stepMinutes * 60 * 1000;
+        return new Date(Math.ceil(date.getTime() / ms) * ms);
+      }
+
+      var startInput = document.getElementById('id_start_datetime');
+      var endInput = document.getElementById('id_end_datetime');
+      if (!startInput || !endInput) return;
+
+      function refreshMins() {
+        var now = roundUpToStep(new Date(), 5);
+        var minVal = localDatetimeValue(now);
+        startInput.min = minVal;
+
+        if (!endInput.value || endInput.value < startInput.value) {
+          endInput.min = startInput.value || minVal;
+        }
+      }
+
+      startInput.addEventListener('change', function () {
+        if (this.value) {
+          endInput.min = this.value;
+          if (endInput.value && endInput.value <= this.value) {
+            endInput.value = '';
+          }
+        }
+      });
+
+      refreshMins();
+      setInterval(refreshMins, 30000);
+    })();
+  </script>
 </body>
 
 </html>

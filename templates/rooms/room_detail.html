@@ -47,7 +47,7 @@
           {% if is_available %}
           <span class="status-badge status-available">Disponível agora</span>
           <p>Esta sala está livre no momento atual.</p>
-          <a href="{% url 'reservations:reservation_create' %}?room={{ room.id }}" class="btn btn-primary">Reservar sala</a>
+          <a href="{% url 'reservations:reservation_create_for_room' room.id %}" class="btn btn-primary">Reservar sala</a>
           {% else %}
           <span class="status-badge status-unavailable">Indisponível agora</span>
           <p>Existe uma reserva ativa para esta sala neste momento.</p>

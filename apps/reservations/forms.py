@@ -1,9 +1,10 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from apps.rooms.models import Room
 
-from .models import Reservation, ReservationStatus
+from .models import Reservation
 
 
 class ReservationForm(forms.ModelForm):
@@ -11,14 +12,33 @@ class ReservationForm(forms.ModelForm):
         model = Reservation
         fields = ["room", "start_datetime", "end_datetime", "description"]
         widgets = {
-            "start_datetime": forms.DateTimeInput(attrs={"type": "datetime-local"}),
-            "end_datetime": forms.DateTimeInput(attrs={"type": "datetime-local"}),
-            "description": forms.Textarea(attrs={"rows": 3}),
+            "start_datetime": forms.DateTimeInput(
+                attrs={"type": "datetime-local", "class": "input-control", "step": "300"}
+            ),
+            "end_datetime": forms.DateTimeInput(
+                attrs={"type": "datetime-local", "class": "input-control", "step": "300"}
+            ),
+            "description": forms.Textarea(attrs={"rows": 3, "class": "input-control"}),
         }
 
     def __init__(self, *args, **kwargs):
+        selected_room = kwargs.pop("room", None)
         super().__init__(*args, **kwargs)
         self.fields["room"].queryset = Room.objects.filter(is_active=True).order_by("name")
+        self.fields["start_datetime"].input_formats = ["%Y-%m-%dT%H:%M"]
+        self.fields["end_datetime"].input_formats = ["%Y-%m-%dT%H:%M"]
+        self.fields["room"].widget.attrs["class"] = "input-control"
+
+        min_datetime_value = timezone.localtime(timezone.now()).strftime("%Y-%m-%dT%H:%M")
+        self.fields["start_datetime"].widget.attrs["min"] = min_datetime_value
+        self.fields["end_datetime"].widget.attrs["min"] = min_datetime_value
+
+        if selected_room is not None:
+            self.fields["room"].queryset = Room.objects.filter(pk=selected_room.pk)
+            self.fields["room"].initial = selected_room
+
+    def clean_description(self):
+        return (self.cleaned_data.get("description") or "").strip()
 
     def clean(self):
         cleaned_data = super().clean()
@@ -29,22 +49,12 @@ class ReservationForm(forms.ModelForm):
         if not room or not start_datetime or not end_datetime:
             return cleaned_data
 
+        # All business-rule validation is handled by model.clean() via
+        # ModelForm._post_clean(), so we only do structural checks here
+        # to keep error messages in one authoritative place.
         if end_datetime <= start_datetime:
-            raise ValidationError("A data/hora de término deve ser posterior ao início.")
-
-        conflict_qs = Reservation.objects.filter(
-            room=room,
-            status=ReservationStatus.ACTIVE,
-            start_datetime__lt=end_datetime,
-            end_datetime__gt=start_datetime,
-        )
-
-        if self.instance.pk:
-            conflict_qs = conflict_qs.exclude(pk=self.instance.pk)
-
-        if conflict_qs.exists():
             raise ValidationError(
-                "Já existe uma reserva ativa para esta sala no intervalo informado."
+                "O horário de término precisa ser depois do horário de início."
             )
 
         return cleaned_data

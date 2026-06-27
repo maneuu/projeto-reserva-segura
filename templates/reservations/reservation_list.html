@@ -10,9 +10,28 @@
 </head>
 
 <body>
-  <main class="auth-card" style="max-width: 760px;">
-    <h1 class="auth-title">Minhas reservas</h1>
-    <p class="auth-subtitle">Reservas vinculadas ao seu usuário.</p>
+  <main class="auth-card wide">
+    <div class="page-header">
+      <div>
+        <h1 class="auth-title">Minhas reservas</h1>
+        {% if is_admin_view %}
+        <p class="auth-subtitle">Você está visualizando todas as reservas por ser administrador.</p>
+        {% else %}
+        <p class="auth-subtitle">Reservas vinculadas ao seu usuário.</p>
+        {% endif %}
+      </div>
+
+      <nav class="page-links" aria-label="Navegação">
+        <a class="page-link" href="{% url 'home' %}">Home</a>
+        <a class="page-link" href="{% url 'rooms:room_list' %}">Reservar nova sala</a>
+      </nav>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="info-banner">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
 
     {% if reservations %}
     <ul class="reservation-list">
@@ -22,9 +41,23 @@
         <div class="reservation-meta">
           {{ reservation.start_datetime|date:"d/m/Y H:i" }} até {{ reservation.end_datetime|date:"d/m/Y H:i" }}
         </div>
+        <div class="reservation-meta"><strong>Status:</strong> {{ reservation.get_status_display }}</div>
+        {% if is_admin_view %}
+        <div class="reservation-meta"><strong>Usuário:</strong> {{ reservation.user.get_full_name|default:reservation.user.username }}</div>
+        {% endif %}
         {% if reservation.description %}
         <div class="reservation-meta">{{ reservation.description }}</div>
         {% endif %}
+
+        <div class="reservation-actions">
+          <a class="page-link" href="{% url 'reservations:reservation_detail' reservation.id %}">Ver detalhes</a>
+          {% if reservation.status == 'ACTIVE' %}
+          <form method="post" action="{% url 'reservations:reservation_cancel' reservation.id %}">
+            {% csrf_token %}
+            <button type="submit" class="submit-btn submit-btn-small">Cancelar</button>
+          </form>
+          {% endif %}
+        </div>
       </li>
       {% endfor %}
     </ul>
@@ -32,9 +65,6 @@
     <p class="reservation-meta">Você ainda não possui reservas cadastradas.</p>
     {% endif %}
 
-    <p class="auth-footer">
-      <a href="{% url 'home' %}">Voltar para a home</a>
-    </p>
   </main>
 </body>
 

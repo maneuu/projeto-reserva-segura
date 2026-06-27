@@ -98,7 +98,10 @@ body {
   font-weight: 600;
 }
 
-.field-group input {
+.field-group input,
+.field-group select,
+.field-group textarea,
+.input-control {
   width: 100%;
   padding: 12px 14px;
   border: 1px solid #d1d5db;
@@ -110,9 +113,17 @@ body {
     box-shadow 0.2s ease;
 }
 
-.field-group input:focus {
+.field-group input:focus,
+.field-group select:focus,
+.field-group textarea:focus,
+.input-control:focus {
   border-color: #0056b3;
   box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.12);
+}
+
+.field-group textarea {
+  resize: vertical;
+  min-height: 96px;
 }
 
 .error-list,
@@ -150,6 +161,13 @@ body {
   transform: translateY(-1px);
 }
 
+.submit-btn-small {
+  width: auto;
+  margin: 0;
+  padding: 10px 14px;
+  font-size: 0.92rem;
+}
+
 .auth-footer {
   margin-top: 18px;
   text-align: center;
@@ -175,6 +193,67 @@ body {
   font-size: 0.95rem;
 }
 
+.form-error-block {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #fff8f0;
+  border: 1px solid #f59e0b;
+  font-size: 0.95rem;
+  color: #92400e;
+  margin-bottom: 4px;
+}
+
+.form-error-icon {
+  font-size: 1.2rem;
+  line-height: 1.4;
+  flex-shrink: 0;
+  color: #d97706;
+}
+
+.form-error-block .error-list {
+  margin: 6px 0 0 16px;
+  padding: 0;
+  list-style: disc;
+}
+
+.form-error-block .error-list li {
+  margin-top: 4px;
+  color: #92400e;
+}
+
+.input-readonly {
+  background: #f3f4f6;
+  color: #374151;
+  cursor: default;
+  user-select: none;
+  font-weight: 600;
+}
+
+.field-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.field-optional {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #9ca3af;
+}
+
+.info-banner {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #ecfdf3;
+  color: #116336;
+  border: 1px solid #b7f0cf;
+  font-size: 0.95rem;
+  margin-bottom: 14px;
+}
+
 .reservation-list {
   list-style: none;
   padding: 0;
@@ -194,6 +273,30 @@ body {
   color: #6b7280;
   font-size: 0.95rem;
   margin-top: 6px;
+}
+
+.reservation-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.section-divider {
+  margin: 24px 0;
+  border: 0;
+  border-top: 1px solid #e8e8e8;
+}
+
+.section-title {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.reservation-detail-panel p {
+  margin: 8px 0;
 }
 
 @media (max-width: 520px) {

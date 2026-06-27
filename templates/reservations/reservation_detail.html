@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes da Reserva</title>
+  <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}">
+</head>
+
+<body>
+  <main class="auth-card wide">
+    <div class="page-header">
+      <div>
+        <h1 class="auth-title">Detalhes da reserva</h1>
+        <p class="auth-subtitle">Consulte os dados e, se necessário, cancele a reserva.</p>
+      </div>
+
+      <nav class="page-links" aria-label="Navegação">
+        <a class="page-link" href="{% url 'home' %}">Home</a>
+        <a class="page-link" href="{% url 'reservations:reservation_list' %}">Minhas reservas</a>
+      </nav>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="info-banner">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+
+    <section class="reservation-item reservation-detail-panel">
+      <p><strong>Sala:</strong> {{ reservation.room.name }}</p>
+      <p><strong>Usuário:</strong> {{ reservation.user.get_full_name|default:reservation.user.username }}</p>
+      <p><strong>Início:</strong> {{ reservation.start_datetime|date:"d/m/Y H:i" }}</p>
+      <p><strong>Término:</strong> {{ reservation.end_datetime|date:"d/m/Y H:i" }}</p>
+      <p><strong>Status:</strong> {{ reservation.get_status_display }}</p>
+    </section>
+
+    {% if reservation.description %}
+    <p class="reservation-meta"><strong>Descrição:</strong> {{ reservation.description }}</p>
+    {% endif %}
+
+    {% if can_cancel and reservation.status == 'ACTIVE' %}
+    <form method="post" action="{% url 'reservations:reservation_cancel' reservation.id %}" class="reservation-actions">
+      {% csrf_token %}
+      <button type="submit" class="submit-btn submit-btn-small">Cancelar reserva</button>
+    </form>
+    {% endif %}
+  </main>
+</body>
+
+</html>
