@@ -21,8 +21,19 @@
         <h1>Salas cadastradas</h1>
         <p class="subtitle">Busque por nome, filtre por status e inicie reservas sem conflito.</p>
       </div>
-      <a href="{% url 'home' %}" class="btn btn-secondary">Voltar para home</a>
+      <div class="header-actions">
+        {% if request.user.is_staff %}
+        <a href="{% url 'rooms:room_create' %}" class="btn btn-primary">Cadastrar sala</a>
+        {% endif %}
+        <a href="{% url 'home' %}" class="btn btn-secondary">Voltar para home</a>
+      </div>
     </header>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="info-banner">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
 
     <section class="filters-panel">
       <form method="get" class="filters-form">
@@ -55,7 +66,9 @@
             <h2>{{ item.room.name }}</h2>
             <p class="room-location"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ item.room.location }}</p>
           </div>
-          {% if item.is_available %}
+          {% if not item.room.is_active %}
+          <span class="status-badge status-unavailable">Inativa</span>
+          {% elif item.is_available %}
           <span class="status-badge status-available">Disponível</span>
           {% else %}
           <span class="status-badge status-unavailable">Indisponível</span>
@@ -78,10 +91,25 @@
 
           {% if item.is_available %}
           <a href="{% url 'reservations:reservation_create_for_room' item.room.id %}" class="btn btn-primary">Reservar sala</a>
-          {% else %}
+          {% elif item.room.is_active %}
           <button class="btn btn-disabled" type="button" disabled>Indisponível no momento</button>
           {% endif %}
         </div>
+
+        {% if request.user.is_staff %}
+        <div class="room-actions room-admin-actions">
+          <a href="{% url 'rooms:room_update' item.room.id %}" class="btn btn-secondary">Editar</a>
+          <form method="post" action="{% url 'rooms:room_toggle_active' item.room.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            {% if item.room.is_active %}
+            <button type="submit" class="btn btn-disabled">Desativar</button>
+            {% else %}
+            <button type="submit" class="btn btn-primary">Ativar</button>
+            {% endif %}
+          </form>
+        </div>
+        {% endif %}
       </article>
       {% empty %}
       <div class="empty-state">

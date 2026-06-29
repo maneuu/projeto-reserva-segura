@@ -20,8 +20,19 @@
         <h1>{{ room.name }}</h1>
         <p class="subtitle">Verifique informações e inicie uma reserva segura.</p>
       </div>
-      <a href="{% url 'rooms:room_list' %}" class="btn btn-secondary">Voltar para salas</a>
+      <div class="header-actions">
+        {% if request.user.is_staff %}
+        <a href="{% url 'rooms:room_update' room.id %}" class="btn btn-primary">Editar sala</a>
+        {% endif %}
+        <a href="{% url 'rooms:room_list' %}" class="btn btn-secondary">Voltar para salas</a>
+      </div>
     </header>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="info-banner">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
 
     <section class="room-detail-card">
       <div class="room-detail-grid">
@@ -44,7 +55,10 @@
           </p>
         </div>
         <div class="room-status-panel">
-          {% if is_available %}
+          {% if not room.is_active %}
+          <span class="status-badge status-unavailable">Sala inativa</span>
+          <p>Esta sala está desativada e não pode ser reservada.</p>
+          {% elif is_available %}
           <span class="status-badge status-available">Disponível agora</span>
           <p>Esta sala está livre no momento atual.</p>
           <a href="{% url 'reservations:reservation_create_for_room' room.id %}" class="btn btn-primary">Reservar sala</a>
@@ -52,6 +66,18 @@
           <span class="status-badge status-unavailable">Indisponível agora</span>
           <p>Existe uma reserva ativa para esta sala neste momento.</p>
           <button class="btn btn-disabled" type="button" disabled>Indisponível no momento</button>
+          {% endif %}
+
+          {% if request.user.is_staff %}
+          <form method="post" action="{% url 'rooms:room_toggle_active' room.id %}" class="room-admin-actions">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            {% if room.is_active %}
+            <button type="submit" class="btn btn-disabled">Desativar sala</button>
+            {% else %}
+            <button type="submit" class="btn btn-primary">Ativar sala</button>
+            {% endif %}
+          </form>
           {% endif %}
         </div>
       </div>

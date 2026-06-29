@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ form_title }} | Reserva Segura</title>
+  <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}">
+</head>
+
+<body>
+  <main class="auth-card wide">
+    <div class="page-header">
+      <div>
+        <h1 class="auth-title">{{ form_title }}</h1>
+        <p class="auth-subtitle">Preencha os dados da sala. Campos validados e sanitizados automaticamente.</p>
+      </div>
+
+      <nav class="page-links" aria-label="Navegação">
+        <a class="page-link" href="{% url 'home' %}">Home</a>
+        <a class="page-link" href="{% url 'rooms:room_list' %}">Salas</a>
+      </nav>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="info-banner">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+
+    <form method="post" class="auth-form" novalidate>
+      {% csrf_token %}
+
+      {% if form.errors %}
+      <div class="form-error-block" role="alert">
+        <span class="form-error-icon">&#9888;</span>
+        <div>
+          <strong>Corrija os itens abaixo para continuar:</strong>
+          <ul class="error-list">
+            {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+            {% for field in form %}
+            {% for error in field.errors %}
+            <li>{{ field.label }}: {{ error }}</li>
+            {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="field-group">
+        <label for="{{ form.name.id_for_label }}">Nome</label>
+        {{ form.name }}
+      </div>
+
+      <div class="field-group">
+        <label for="{{ form.location.id_for_label }}">Localização</label>
+        {{ form.location }}
+      </div>
+
+      <div class="field-group">
+        <label for="{{ form.capacity.id_for_label }}">Capacidade</label>
+        {{ form.capacity }}
+      </div>
+
+      <div class="field-group">
+        <label for="{{ form.resources.id_for_label }}">Recursos <span class="field-optional">(opcional)</span></label>
+        {{ form.resources }}
+      </div>
+
+      <div class="field-group">
+        <label for="{{ form.description.id_for_label }}">Descrição <span class="field-optional">(opcional)</span></label>
+        {{ form.description }}
+      </div>
+
+      <div class="field-group field-inline">
+        {{ form.is_active }}
+        <label for="{{ form.is_active.id_for_label }}">Sala ativa (disponível para reservas)</label>
+      </div>
+
+      <button type="submit" class="submit-btn">{{ submit_label }}</button>
+    </form>
+
+    <p class="auth-footer">
+      <a href="{% url 'rooms:room_list' %}">Voltar para a lista de salas</a>
+    </p>
+  </main>
+</body>
+
+</html>
