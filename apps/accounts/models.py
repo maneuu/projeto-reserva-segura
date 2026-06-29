@@ -3,10 +3,13 @@ from django.db import models
 
 
 class UserManager(BaseUserManager):
+    def get_by_natural_key(self, email):
+        return self.get(email__iexact=email)
+
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError("O email é obrigatório")
-        email = self.normalize_email(email)
+        email = self.normalize_email(email.strip())
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)

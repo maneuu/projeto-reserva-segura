@@ -41,8 +41,13 @@
           <label for="search">Buscar sala</label>
           <div class="input-icon">
             <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-            <input id="search" type="text" name="search" value="{{ search }}" placeholder="Ex.: Laboratório de Redes">
+            <input id="search" type="text" name="search" value="{{ search }}" placeholder="Ex.: Laboratório de Redes" maxlength="100">
           </div>
+          {% for error in search_form.search.errors %}
+          <ul class="field-errors">
+            <li>{{ error }}</li>
+          </ul>
+          {% endfor %}
         </div>
 
         <div class="field-group">
@@ -52,6 +57,11 @@
             <option value="available" {% if status_available %}selected{% endif %}>Apenas disponíveis</option>
             <option value="unavailable" {% if status_unavailable %}selected{% endif %}>Apenas indisponíveis</option>
           </select>
+          {% for error in search_form.status.errors %}
+          <ul class="field-errors">
+            <li>{{ error }}</li>
+          </ul>
+          {% endfor %}
         </div>
 
         <button type="submit" class="btn btn-primary">Aplicar filtros</button>

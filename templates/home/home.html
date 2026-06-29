@@ -28,9 +28,12 @@
 
           <span class="user-name">{{ request.user.first_name|default:request.user.email }}</span>
 
-          <a href="{% url 'accounts:logout' %}" class="btn-icon" title="Sair">
-            <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
-          </a>
+          <form action="{% url 'accounts:logout' %}" method="post" class="logout-form">
+            {% csrf_token %}
+            <button type="submit" class="btn-icon" title="Sair" aria-label="Sair">
+              <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+            </button>
+          </form>
         </div>
         {% else %}
         <a href="{% url 'accounts:login' %}" class="btn-login">

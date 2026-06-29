@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -15,8 +17,11 @@ from django.views.generic import CreateView, UpdateView
 
 from apps.reservations.models import Reservation, ReservationStatus
 
-from .forms import RoomForm
+from .forms import RoomForm, RoomSearchForm
 from .models import Room
+
+
+logger = logging.getLogger(__name__)
 
 
 def _is_room_manager(user):
@@ -93,17 +98,35 @@ def room_list(request):
         .order_by("name")
     )
 
-    # Filtro por nome (icontains = "contém", ignorando maiúsc./minúsc.).
-    if search:
-        rooms = rooms.filter(name__icontains=search)
+    search_form = RoomSearchForm(request.GET or None)
+    search = ""
+    status = "all"
 
-    # Filtro por disponibilidade no momento.
-    if status == "available":
-        rooms = rooms.filter(has_active_reservation=False)
-    elif status == "unavailable":
-        rooms = rooms.filter(has_active_reservation=True)
-    else:
-        status = "all"  # normaliza qualquer valor inesperado para "all"
+    if search_form.is_bound:
+        if search_form.is_valid():
+            search = search_form.cleaned_data["search"]
+            status = search_form.cleaned_data["status"]
+
+            # Filtro por nome (icontains = "contém", ignorando maiúsc./minúsc.).
+            if search:
+                rooms = rooms.filter(name__icontains=search)
+
+            # Filtro por disponibilidade no momento.
+            if status == "available":
+                rooms = rooms.filter(has_active_reservation=False)
+            elif status == "unavailable":
+                rooms = rooms.filter(has_active_reservation=True)
+        else:
+            logger.warning(
+                "Busca de salas inválida para o usuário %s: %s",
+                request.user.pk,
+                search_form.errors.as_json(),
+            )
+            rooms = rooms.none()
+
+    search = search_form["search"].value() if search_form.is_bound else ""
+    if not status:
+        status = "all"
 
     paginator = Paginator(rooms, 10)
     page_obj = paginator.get_page(request.GET.get("page"))
@@ -127,6 +150,7 @@ def room_list(request):
         "rooms/room_list.html",
         {
             "room_cards": room_cards,
+            "search_form": search_form,
             "search": search,
             "status": status,
             "page_obj": page_obj,

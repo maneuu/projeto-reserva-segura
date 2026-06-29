@@ -425,6 +425,29 @@ class TestRoomVisibility(TestCase):
         self.assertEqual(len(response_pagina_2.context["room_cards"]), 4)
         self.assertEqual(response_pagina_2.context["page_obj"].number, 2)
 
+    def test_busca_com_caracteres_especiais_nao_quebra_a_lista(self):
+        """A busca deve aceitar caracteres especiais sem gerar erro 500."""
+        self.client.force_login(self.staff_user)
+        response = self.client.get(
+            reverse("rooms:room_list"),
+            {"search": '"<script>alert(1)</script> 😊 \'', "status": "all"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Traceback")
+
+    def test_busca_muito_longa_mostra_erro_amigavel(self):
+        """Entradas muito longas devem ser rejeitadas sem derrubar a view."""
+        self.client.force_login(self.staff_user)
+        response = self.client.get(
+            reverse("rooms:room_list"),
+            {"search": "a" * 101, "status": "all"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "A pesquisa deve ter no máximo 100 caracteres.")
+        self.assertEqual(len(response.context["room_cards"]), 0)
+
     # -- Detalhe ------------------------------------------------------------
 
     def test_usuario_comum_nao_acessa_detalhe_de_sala_inativa(self):

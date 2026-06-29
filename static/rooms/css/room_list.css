@@ -92,6 +92,14 @@ h1 {
   gap: 0.45rem;
 }
 
+.field-errors {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #b91c1c;
+  font-size: 0.92rem;
+}
+
 .field-group label {
   font-weight: 700;
   color: var(--ink-700);

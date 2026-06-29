@@ -176,3 +176,33 @@ class RoomForm(forms.ModelForm):
                 self.add_error("name", "Já existe uma sala cadastrada com esse nome.")
 
         return cleaned_data
+
+
+class RoomSearchForm(forms.Form):
+    search = forms.CharField(
+        label="Buscar sala",
+        required=False,
+        max_length=100,
+        error_messages={
+            "max_length": "A pesquisa deve ter no máximo 100 caracteres.",
+        },
+    )
+    status = forms.ChoiceField(
+        label="Disponibilidade",
+        required=False,
+        choices=(
+            ("all", "Todas as salas"),
+            ("available", "Apenas disponíveis"),
+            ("unavailable", "Apenas indisponíveis"),
+        ),
+        initial="all",
+    )
+
+    def clean_search(self):
+        return (self.cleaned_data.get("search") or "").strip()
+
+    def clean_status(self):
+        status = self.cleaned_data.get("status") or "all"
+        if status not in {"all", "available", "unavailable"}:
+            raise forms.ValidationError("Selecione um filtro de disponibilidade válido.")
+        return status
