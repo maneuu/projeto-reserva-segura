@@ -232,6 +232,20 @@ textarea:focus {
   color: var(--ink-700);
 }
 
+.pagination {
+  margin-top: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.pagination-info {
+  color: var(--ink-700);
+  font-weight: 700;
+}
+
 .room-detail-card {
   padding: 1.2rem;
 }

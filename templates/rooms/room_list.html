@@ -118,6 +118,24 @@
       </div>
       {% endfor %}
     </section>
+
+    {% if is_paginated %}
+    <nav class="pagination" aria-label="Paginação das salas">
+      {% if page_obj.has_previous %}
+      <a class="btn btn-secondary" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+      {% else %}
+      <span class="btn btn-disabled" aria-disabled="true">Anterior</span>
+      {% endif %}
+
+      <span class="pagination-info">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+
+      {% if page_obj.has_next %}
+      <a class="btn btn-secondary" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.next_page_number }}">Próxima</a>
+      {% else %}
+      <span class="btn btn-disabled" aria-disabled="true">Próxima</span>
+      {% endif %}
+    </nav>
+    {% endif %}
   </main>
 </body>
 

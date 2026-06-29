@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.db import DatabaseError
 from django.db.models import Exists, OuterRef
 from django.shortcuts import get_object_or_404, redirect, render
@@ -104,6 +105,9 @@ def room_list(request):
     else:
         status = "all"  # normaliza qualquer valor inesperado para "all"
 
+    paginator = Paginator(rooms, 10)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
     # Monta uma lista de dicionários para o template: cada item tem a sala e
     # um booleano 'is_available' já calculado (sala precisa estar ativa E sem
     # reserva ativa no momento).
@@ -112,8 +116,11 @@ def room_list(request):
             "room": room,
             "is_available": room.is_active and not room.has_active_reservation,
         }
-        for room in rooms
+        for room in page_obj.object_list
     ]
+
+    query_params = request.GET.copy()
+    query_params.pop("page", None)
 
     return render(
         request,
@@ -122,6 +129,9 @@ def room_list(request):
             "room_cards": room_cards,
             "search": search,
             "status": status,
+            "page_obj": page_obj,
+            "is_paginated": page_obj.paginator.num_pages > 1,
+            "query_string": query_params.urlencode(),
             # Flags booleanas para marcar a opção selecionada no <select>.
             "status_all": status == "all",
             "status_available": status == "available",

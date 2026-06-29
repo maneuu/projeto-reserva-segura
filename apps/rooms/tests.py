@@ -407,6 +407,24 @@ class TestRoomVisibility(TestCase):
         self.assertIn("Sala Ativa", nomes)
         self.assertIn("Sala Inativa", nomes)
 
+    def test_lista_de_salas_exibe_no_maximo_10_por_pagina(self):
+        """A paginação da listagem deve limitar a tela a 10 salas por vez."""
+        self.client.force_login(self.staff_user)
+
+        for indice in range(12):
+            make_room(name=f"Sala Extra {indice:02d}")
+
+        response = self.client.get(reverse("rooms:room_list"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["room_cards"]), 10)
+        self.assertEqual(response.context["page_obj"].number, 1)
+        self.assertTrue(response.context["is_paginated"])
+
+        response_pagina_2 = self.client.get(reverse("rooms:room_list"), {"page": 2})
+        self.assertEqual(response_pagina_2.status_code, 200)
+        self.assertEqual(len(response_pagina_2.context["room_cards"]), 4)
+        self.assertEqual(response_pagina_2.context["page_obj"].number, 2)
+
     # -- Detalhe ------------------------------------------------------------
 
     def test_usuario_comum_nao_acessa_detalhe_de_sala_inativa(self):
