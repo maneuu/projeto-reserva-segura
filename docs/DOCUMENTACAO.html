@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentacao Tecnica - Sistema de Reserva Segura - IFPB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue-900:#0a1f44; --blue-700:#123a7a; --blue-600:#1850a3;
+    --blue-500:#2563c9; --blue-50:#eaf1fc; --line:#dbe6f7;
+    --ink:#1a2536; --muted:#5a6b86; --white:#fff;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:#e9eef6;
+    font-family:"Inter",system-ui,sans-serif;
+    color:var(--ink); line-height:1.6; font-size:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{
+    max-width:880px; margin:32px auto 80px; background:var(--white);
+    padding:64px 72px; border-radius:10px;
+    box-shadow:0 20px 60px -30px rgba(10,31,68,.45);
+  }
+  h1,h2,h3{font-family:"Sora",sans-serif; line-height:1.2}
+  h1{
+    font-size:2.1rem; color:var(--blue-900);
+    border-bottom:4px solid var(--blue-500);
+    padding-bottom:.4rem; margin:0 0 .3rem;
+  }
+  h2{
+    font-size:1.5rem; color:var(--blue-700);
+    border-bottom:1px solid var(--line);
+    padding-bottom:.3rem; margin:2.4rem 0 1rem;
+  }
+  h3{font-size:1.18rem; color:var(--blue-600); margin:1.6rem 0 .5rem}
+  p{margin:.6rem 0; text-align:justify}
+  a{color:var(--blue-600); text-decoration:none}
+  a:hover{text-decoration:underline}
+  strong{color:var(--blue-900)}
+  ul,ol{margin:.6rem 0 .6rem .4rem; padding-left:1.4rem}
+  li{margin:.25rem 0}
+  hr{border:none; border-top:1px solid var(--line); margin:2rem 0}
+  table{
+    width:100%; border-collapse:collapse; margin:1rem 0;
+    font-size:.9rem; box-shadow:0 4px 14px -10px rgba(10,31,68,.4);
+  }
+  th{
+    background:var(--blue-700); color:#fff; text-align:left;
+    padding:.6rem .8rem; font-family:"Sora",sans-serif; font-weight:600;
+  }
+  td{padding:.5rem .8rem; border:1px solid var(--line)}
+  tr:nth-child(even) td{background:#f3f7fd}
+  code{
+    font-family:"SFMono-Regular",Consolas,monospace; font-size:.85em;
+    background:var(--blue-50); color:var(--blue-700);
+    padding:.1rem .35rem; border-radius:4px;
+  }
+  pre{
+    background:var(--blue-900); color:#dbe7ff; border-radius:10px;
+    padding:1rem 1.2rem; margin:1rem 0; overflow:auto;
+    font-family:"SFMono-Regular",Consolas,monospace; font-size:.82rem;
+    line-height:1.55;
+  }
+  pre code{background:transparent; color:#dbe7ff; padding:0; font-size:inherit}
+  blockquote{
+    border-left:4px solid var(--blue-500); background:#f3f7fd;
+    margin:1rem 0; padding:.6rem 1.2rem; color:#3a4a63; border-radius:0 6px 6px 0;
+  }
+  /* barra de acoes flutuante */
+  .toolbar{
+    position:fixed; top:18px; right:24px; z-index:100; display:flex; gap:10px;
+  }
+  .btn{
+    display:inline-flex; align-items:center; gap:.5rem;
+    font-family:"Sora",sans-serif; font-weight:600; font-size:.9rem;
+    border:none; border-radius:999px; padding:.7rem 1.3rem; cursor:pointer;
+    box-shadow:0 8px 22px -8px rgba(37,99,201,.6); transition:transform .12s;
+  }
+  .btn:hover{transform:translateY(-1px)}
+  .btn-primary{background:var(--blue-600); color:#fff}
+  .btn-ghost{background:#fff; color:var(--blue-700); border:1px solid var(--line)}
+  .hint{
+    position:fixed; bottom:18px; right:24px; z-index:100;
+    background:rgba(10,31,68,.9); color:#cfe0ff; font-size:.78rem;
+    padding:.5rem .9rem; border-radius:999px;
+  }
+  @media print{
+    body{background:#fff}
+    .page{box-shadow:none; margin:0; max-width:none; padding:0; border-radius:0}
+    .toolbar,.hint{display:none !important}
+    h1,h2,h3{page-break-after:avoid}
+    table,pre,blockquote{page-break-inside:avoid}
+    a{color:var(--blue-700)}
+    @page{margin:1.6cm}
+  }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <button class="btn btn-primary" onclick="window.print()">&#11015; Baixar PDF</button>
+</div>
+<div class="page">
+<h1 id="sistema-de-reserva-segura">Sistema de Reserva Segura</h1>
+<h2 id="documentacao-tecnica-do-projeto">Documentação Técnica do Projeto</h2>
+<p><strong>Instituto Federal de Educação, Ciência e Tecnologia da Paraíba (IFPB)</strong>
+Curso: Tecnologia em Sistemas para Internet</p>
+<hr />
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Projeto</strong></td>
+<td>Sistema de Reserva Segura — reserva de salas</td>
+</tr>
+<tr>
+<td><strong>Tecnologia</strong></td>
+<td>Django 6 · Python 3.13</td>
+</tr>
+<tr>
+<td><strong>Banco de dados</strong></td>
+<td>SQLite (desenvolvimento)</td>
+</tr>
+<tr>
+<td><strong>Foco</strong></td>
+<td>Programação segura (OWASP) e conformidade com a LGPD</td>
+</tr>
+<tr>
+<td><strong>Data</strong></td>
+<td>Junho de 2026</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="sumario">Sumário</h2>
+<ol>
+<li><a href="#1-visão-geral">Visão Geral</a></li>
+<li><a href="#2-objetivos-e-requisitos">Objetivos e Requisitos</a></li>
+<li><a href="#3-arquitetura-e-tecnologias">Arquitetura e Tecnologias</a></li>
+<li><a href="#4-estrutura-do-projeto">Estrutura do Projeto</a></li>
+<li><a href="#5-modelagem-de-dados">Modelagem de Dados</a></li>
+<li><a href="#6-módulos-e-funcionalidades">Módulos e Funcionalidades</a></li>
+<li><a href="#7-fluxos-de-uso">Fluxos de Uso</a></li>
+<li><a href="#8-segurança-da-aplicação">Segurança da Aplicação</a></li>
+<li><a href="#9-sistema-de-logs-e-auditoria">Sistema de Logs e Auditoria</a></li>
+<li><a href="#10-instalação-e-execução">Instalação e Execução</a></li>
+<li><a href="#11-comandos-de-gestão">Comandos de Gestão</a></li>
+<li><a href="#12-considerações-finais">Considerações Finais</a></li>
+</ol>
+<hr />
+<h2 id="1-visao-geral">1. Visão Geral</h2>
+<p>O <strong>Sistema de Reserva Segura</strong> é uma aplicação web desenvolvida em Django que
+permite o gerenciamento e a reserva de salas do IFPB. O sistema foi concebido
+com a <strong>segurança da informação como princípio norteador</strong>: cada funcionalidade
+foi implementada seguindo as práticas de programação segura recomendadas pela
+<strong>OWASP (Open Worldwide Application Security Project)</strong> e os princípios de
+proteção de dados pessoais previstos na <strong>LGPD (Lei nº 13.709/2018)</strong>.</p>
+<p>A plataforma atende a três perfis de usuário:</p>
+<ul>
+<li><strong>Usuário comum:</strong> consulta salas disponíveis e gerencia suas próprias reservas.</li>
+<li><strong>Equipe (staff):</strong> além das funções do usuário comum, cadastra, edita e
+  ativa/desativa salas.</li>
+<li><strong>Administrador (superuser):</strong> acesso total, incluindo o painel administrativo.</li>
+</ul>
+<p>O diferencial do projeto está na <strong>defesa em profundidade</strong> — a segurança não é
+concentrada em um único ponto, mas distribuída por todas as camadas da aplicação:
+da validação da entrada do usuário até a gravação no banco de dados.</p>
+<hr />
+<h2 id="2-objetivos-e-requisitos">2. Objetivos e Requisitos</h2>
+<h3 id="21-objetivo-geral">2.1 Objetivo Geral</h3>
+<p>Desenvolver um sistema web seguro para reserva de salas, aplicando na prática os
+conceitos de programação segura, controle de acesso e proteção de dados.</p>
+<h3 id="22-requisitos-funcionais">2.2 Requisitos Funcionais</h3>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Requisito</th>
+<th style="text-align: center;">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RF01</td>
+<td>Cadastro de usuários com e-mail e senha</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RF02</td>
+<td>Autenticação (login/logout)</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RF03</td>
+<td>Listagem de salas com busca e paginação</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RF04</td>
+<td>Visualização de detalhes da sala</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RF05</td>
+<td>Cadastro de salas (restrito à equipe)</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RF06</td>
+<td>Edição de salas (restrito à equipe)</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RF07</td>
+<td>Ativação/desativação de salas (restrito à equipe)</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RF08</td>
+<td>Criação de reservas com seleção de data/hora</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RF09</td>
+<td>Prevenção de conflito de horários</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RF10</td>
+<td>Cancelamento de reservas</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RF11</td>
+<td>Expiração automática de reservas vencidas</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RF12</td>
+<td>Painel administrativo personalizado</td>
+<td style="text-align: center;">✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="23-requisitos-nao-funcionais">2.3 Requisitos Não Funcionais</h3>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Requisito</th>
+<th style="text-align: center;">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RNF01</td>
+<td>Validação de todos os dados no servidor</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RNF02</td>
+<td>Senhas armazenadas com hash criptográfico</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RNF03</td>
+<td>Sanitização de entradas contra XSS/injeção</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RNF04</td>
+<td>Registro de eventos (logs de auditoria)</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RNF05</td>
+<td>Proteção de dados pessoais nos logs (LGPD)</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RNF06</td>
+<td>Controle de acesso baseado em papéis</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RNF07</td>
+<td>Interface padronizada com identidade visual IFPB</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td>RNF08</td>
+<td>Proteção contra condições de corrida (race conditions)</td>
+<td style="text-align: center;">✅</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-arquitetura-e-tecnologias">3. Arquitetura e Tecnologias</h2>
+<h3 id="31-padrao-arquitetural">3.1 Padrão Arquitetural</h3>
+<p>O projeto segue o padrão <strong>MTV (Model-Template-View)</strong> do Django, uma variação
+do clássico MVC, complementado por uma <strong>camada de serviços</strong> (<code>services.py</code>)
+para isolar operações transacionais complexas.</p>
+<pre><code>┌─────────────────────────────────────────────────────────┐
+│                      NAVEGADOR                            │
+│         (HTML + CSS · auto-escape do Django)             │
+└───────────────────────────┬─────────────────────────────┘
+                            │ HTTP (CSRF + cabeçalhos de segurança)
+┌───────────────────────────▼─────────────────────────────┐
+│                       VIEWS                              │
+│   Autenticação · Autorização · Orquestração de fluxo    │
+└───────────────────────────┬─────────────────────────────┘
+                            │
+┌──────────────┬────────────▼───────────┬─────────────────┐
+│    FORMS     │       SERVICES         │     MODELS       │
+│ Sanitização  │  Transações atômicas   │ Regras negócio  │
+│  Validação   │  + travas de linha     │  full_clean()   │
+└──────────────┴────────────┬───────────┴─────────────────┘
+                            │ ORM (queries parametrizadas)
+┌───────────────────────────▼─────────────────────────────┐
+│                  BANCO DE DADOS (SQLite)                 │
+└─────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="32-tecnologias-utilizadas">3.2 Tecnologias Utilizadas</h3>
+<table>
+<thead>
+<tr>
+<th>Camada</th>
+<th>Tecnologia</th>
+<th>Função</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Backend</td>
+<td><strong>Django 6.0.6</strong></td>
+<td>Framework web full-stack</td>
+</tr>
+<tr>
+<td>Linguagem</td>
+<td><strong>Python 3.13</strong></td>
+<td>Linguagem de programação</td>
+</tr>
+<tr>
+<td>Banco de dados</td>
+<td><strong>SQLite</strong></td>
+<td>Persistência (desenvolvimento)</td>
+</tr>
+<tr>
+<td>Frontend</td>
+<td><strong>HTML5 + CSS3</strong></td>
+<td>Interface do usuário</td>
+</tr>
+<tr>
+<td>Calendário</td>
+<td><strong>flatpickr</strong></td>
+<td>Seletor visual de data e hora</td>
+</tr>
+<tr>
+<td>Ícones</td>
+<td><strong>Font Awesome 6</strong></td>
+<td>Iconografia</td>
+</tr>
+<tr>
+<td>Fontes</td>
+<td><strong>Google Fonts</strong> (Sora, Inter)</td>
+<td>Tipografia</td>
+</tr>
+<tr>
+<td>Logs</td>
+<td><strong>logging</strong> (nativo Python)</td>
+<td>Auditoria de eventos</td>
+</tr>
+</tbody>
+</table>
+<p>A escolha de manter <strong>dependências mínimas</strong> (apenas o Django) é, por si só, uma
+decisão de segurança: reduz a superfície de ataque por vulnerabilidades em
+bibliotecas de terceiros (OWASP A06 — <em>Vulnerable and Outdated Components</em>).</p>
+<hr />
+<h2 id="4-estrutura-do-projeto">4. Estrutura do Projeto</h2>
+<p>O projeto é organizado em <strong>três aplicações Django</strong> (<code>apps/</code>), cada uma com
+responsabilidade única, mais um pacote de configuração (<code>config/</code>).</p>
+<pre><code>projeto-reserva-segura/
+├── config/                      # Configuração global do projeto
+│   ├── settings.py              # Configurações (segurança, logs, apps)
+│   ├── urls.py                  # Roteamento principal + branding do admin
+│   ├── views.py                 # View da página inicial
+│   ├── wsgi.py / asgi.py        # Servidores de aplicação
+│
+├── apps/
+│   ├── accounts/                # Autenticação e usuários
+│   │   ├── models.py            # Modelo User (login por e-mail)
+│   │   ├── forms.py             # LoginForm, RegisterForm (validação)
+│   │   ├── views.py             # login, register, logout
+│   │   └── urls.py
+│   │
+│   ├── rooms/                   # Gestão de salas
+│   │   ├── models.py            # Modelo Room
+│   │   ├── forms.py             # RoomForm (sanitização), RoomSearchForm
+│   │   ├── views.py             # CRUD + autorização (StaffRequiredMixin)
+│   │   ├── admin.py             # Registro no painel admin
+│   │   └── urls.py
+│   │
+│   ├── reservations/            # Reservas
+│   │   ├── models.py            # Modelo Reservation + lógica de status
+│   │   ├── forms.py             # ReservationForm (validação cruzada)
+│   │   ├── services.py          # create_reservation (transação + lock)
+│   │   ├── views.py             # listar, criar, detalhar, cancelar
+│   │   ├── management/commands/
+│   │   │   └── expire_reservations.py   # Comando de expiração (cron)
+│   │   └── urls.py
+│   │
+│   └── utils.py                 # mask_email (proteção de PII)
+│
+├── templates/                   # Templates HTML (herança de base.html)
+│   ├── base.html                # Layout mestre
+│   ├── 403.html                 # Página de acesso negado
+│   ├── accounts/ · rooms/ · reservations/ · home/ · admin/
+│
+├── static/                      # CSS, JS e imagens
+│   ├── css/ifpb-theme.css       # Design system institucional
+│   └── admin/css/ifpb-admin.css # Personalização do painel admin
+│
+├── docs/                        # Documentação
+│   ├── DOCUMENTACAO.md          # Este documento
+│   └── SEGURANCA.md             # Documentação detalhada de segurança
+│
+├── logs/                        # Logs de auditoria (gerado em runtime)
+├── requirements.txt             # Dependências (Django==6.0.6)
+└── manage.py                    # Utilitário de linha de comando do Django
+</code></pre>
+<hr />
+<h2 id="5-modelagem-de-dados">5. Modelagem de Dados</h2>
+<p>O sistema possui <strong>três entidades principais</strong>, relacionadas conforme o diagrama
+abaixo.</p>
+<pre><code>┌──────────────────┐         ┌──────────────────┐
+│      User        │         │      Room        │
+├──────────────────┤         ├──────────────────┤
+│ id (PK)          │         │ id (PK)          │
+│ email (unique)   │         │ name             │
+│ password (hash)  │         │ location         │
+│ first_name       │         │ capacity         │
+│ last_name        │         │ resources        │
+│ is_staff         │         │ description      │
+│ is_superuser     │         │ is_active        │
+│ is_active        │         │ created_at       │
+└────────┬─────────┘         │ updated_at       │
+        │                   └────────┬─────────┘
+        │                            │
+        │      ┌──────────────────┐  │
+        │      │   Reservation    │  │
+        │      ├──────────────────┤  │
+        └─────&lt;│ user (FK)        │  │
+              │ room (FK)        │&gt;─┘
+              │ start_datetime   │
+              │ end_datetime     │
+              │ description      │
+              │ status           │  ACTIVE / EXPIRED / CANCELED
+              │ created_at       │
+              │ updated_at       │
+              └──────────────────┘
+</code></pre>
+<h3 id="51-entidade-user-usuario">5.1 Entidade <code>User</code> (Usuário)</h3>
+<p>Modelo de usuário <strong>personalizado</strong>, que usa o <strong>e-mail como identificador</strong>
+(o campo <code>username</code> padrão do Django foi removido). Herda de <code>AbstractUser</code>,
+aproveitando todo o sistema de hash de senha e permissões do Django.</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>email</code></td>
+<td>EmailField (único)</td>
+<td>Identificador de login</td>
+</tr>
+<tr>
+<td><code>password</code></td>
+<td>CharField</td>
+<td>Senha armazenada como <strong>hash PBKDF2</strong></td>
+</tr>
+<tr>
+<td><code>first_name</code>, <code>last_name</code></td>
+<td>CharField</td>
+<td>Nome do usuário</td>
+</tr>
+<tr>
+<td><code>is_staff</code></td>
+<td>Boolean</td>
+<td>Define acesso às funções de equipe</td>
+</tr>
+<tr>
+<td><code>is_superuser</code></td>
+<td>Boolean</td>
+<td>Define acesso total</td>
+</tr>
+</tbody>
+</table>
+<h3 id="52-entidade-room-sala">5.2 Entidade <code>Room</code> (Sala)</h3>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>CharField(255)</td>
+<td>Nome da sala (único, case-insensitive)</td>
+</tr>
+<tr>
+<td><code>location</code></td>
+<td>CharField(255)</td>
+<td>Localização física</td>
+</tr>
+<tr>
+<td><code>capacity</code></td>
+<td>PositiveIntegerField</td>
+<td>Capacidade (1 a 10.000)</td>
+</tr>
+<tr>
+<td><code>resources</code></td>
+<td>TextField</td>
+<td>Recursos disponíveis</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>TextField</td>
+<td>Descrição livre</td>
+</tr>
+<tr>
+<td><code>is_active</code></td>
+<td>Boolean</td>
+<td>Sala disponível para reserva (<em>soft delete</em>)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>A desativação de salas usa o campo <code>is_active</code> em vez de exclusão física
+(<em>soft delete</em>), preservando o histórico de reservas associadas.</p>
+</blockquote>
+<h3 id="53-entidade-reservation-reserva">5.3 Entidade <code>Reservation</code> (Reserva)</h3>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>user</code></td>
+<td>ForeignKey(User)</td>
+<td>Quem reservou</td>
+</tr>
+<tr>
+<td><code>room</code></td>
+<td>ForeignKey(Room)</td>
+<td>Sala reservada</td>
+</tr>
+<tr>
+<td><code>start_datetime</code></td>
+<td>DateTimeField</td>
+<td>Início da reserva</td>
+</tr>
+<tr>
+<td><code>end_datetime</code></td>
+<td>DateTimeField</td>
+<td>Término da reserva</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>CharField (choices)</td>
+<td><code>ACTIVE</code>, <code>EXPIRED</code> ou <code>CANCELED</code></td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>TextField</td>
+<td>Observações (opcional)</td>
+</tr>
+</tbody>
+</table>
+<p>A entidade <code>Reservation</code> concentra a <strong>lógica de negócio mais crítica</strong> do
+sistema, descrita na seção 6.3.</p>
+<hr />
+<h2 id="6-modulos-e-funcionalidades">6. Módulos e Funcionalidades</h2>
+<h3 id="61-modulo-de-contas-accounts">6.1 Módulo de Contas (<code>accounts</code>)</h3>
+<p>Responsável pela identidade dos usuários.</p>
+<p><strong>Funcionalidades:</strong>
+- <strong>Cadastro:</strong> valida nome (apenas letras), e-mail (formato e unicidade) e
+  senha (força mínima, senhas comuns bloqueadas).
+- <strong>Login:</strong> autenticação por e-mail com mensagens genéricas (não revela se o
+  erro foi no e-mail ou na senha, prevenindo enumeração de usuários).
+- <strong>Logout:</strong> executado apenas via <code>POST</code> com token CSRF, impedindo logout
+  forçado por links maliciosos.</p>
+<p><strong>Destaque de segurança:</strong> o redirecionamento após o login valida a URL de
+destino com <code>url_has_allowed_host_and_scheme()</code>, prevenindo ataques de
+<em>open redirect</em>.</p>
+<h3 id="62-modulo-de-salas-rooms">6.2 Módulo de Salas (<code>rooms</code>)</h3>
+<p>Responsável pelo catálogo de salas.</p>
+<p><strong>Funcionalidades:</strong>
+- <strong>Listagem:</strong> com busca por nome, filtro por disponibilidade e paginação
+  (10 salas por página). Usuários comuns veem apenas salas ativas.
+- <strong>Cadastro/Edição/Desativação:</strong> restritos à equipe via <code>StaffRequiredMixin</code>.</p>
+<p><strong>Destaque de segurança:</strong> a filtragem de salas inativas é feita <strong>no banco de
+dados</strong> (queryset), não apenas escondendo botões no template. Isso garante que
+um usuário comum não consiga acessar uma sala inativa nem digitando a URL
+diretamente.</p>
+<h3 id="63-modulo-de-reservas-reservations">6.3 Módulo de Reservas (<code>reservations</code>)</h3>
+<p>O coração do sistema, com a lógica de negócio mais sensível.</p>
+<p><strong>Funcionalidades:</strong>
+- <strong>Criação de reserva:</strong> com calendário visual (flatpickr), validação de
+  data/hora e prevenção de conflitos.
+- <strong>Detecção de conflito:</strong> impede que duas reservas ativas ocupem a mesma sala
+  em horários sobrepostos.
+- <strong>Cancelamento:</strong> idempotente (cancelar uma reserva já cancelada não causa erro).
+- <strong>Expiração automática:</strong> reservas cujo término já passou são marcadas como
+  <code>EXPIRED</code> automaticamente ao listar/abrir reservas, ou via comando agendado.</p>
+<p><strong>Destaque de segurança — prevenção de condição de corrida:</strong>
+A criação de reservas usa <strong>transação atômica com trava de linha</strong>
+(<code>select_for_update()</code>). Sem isso, dois usuários poderiam reservar a mesma sala
+no mesmo horário simultaneamente. A trava serializa as escritas, garantindo que
+a verificação de conflito e a criação aconteçam como uma operação indivisível.</p>
+<pre><code class="language-python">def create_reservation(*, user, room, start_datetime, end_datetime, description=&quot;&quot;):
+    with transaction.atomic():
+        # Trava a linha da sala: serializa escritas concorrentes.
+        locked_room = Room.objects.select_for_update().get(pk=room.pk)
+        if not locked_room.is_active:
+            raise ValidationError(&quot;Não é permitido reservar sala inativa.&quot;)
+        if Reservation.has_conflict(room=locked_room, ..., lock=True):
+            raise ValidationError(&quot;Conflito de horário para esta sala.&quot;)
+        return Reservation.objects.create(...)
+</code></pre>
+<hr />
+<h2 id="7-fluxos-de-uso">7. Fluxos de Uso</h2>
+<h3 id="71-fluxo-de-reserva-de-sala">7.1 Fluxo de Reserva de Sala</h3>
+<pre><code>1. Usuário faz login
+2. Acessa a lista de salas → vê apenas salas ativas
+3. Seleciona uma sala disponível
+4. Preenche data/hora de início e término (calendário visual)
+5. Sistema valida:
+   ├─ término depois do início?
+   ├─ data no futuro?
+   ├─ sala está ativa?
+   └─ não há conflito de horário?  ← com trava de linha no banco
+6. Reserva criada com status ACTIVE
+7. Após o término, status muda automaticamente para EXPIRED
+</code></pre>
+<h3 id="72-fluxo-de-controle-de-acesso">7.2 Fluxo de Controle de Acesso</h3>
+<pre><code>Requisição a rota protegida
+        │
+        ▼
+  Está autenticado?
+   ├─ NÃO → redireciona para /accounts/login/
+   └─ SIM
+        │
+        ▼
+  Tem permissão (papel)?
+   ├─ NÃO → HTTP 403 (Acesso Negado)
+   └─ SIM → executa a ação
+</code></pre>
+<hr />
+<h2 id="8-seguranca-da-aplicacao">8. Segurança da Aplicação</h2>
+<p>A segurança é o pilar central deste projeto. Esta seção resume os controles
+implementados; o detalhamento técnico completo, com trechos de código e
+mapeamento linha a linha, está no documento <strong><code>docs/SEGURANCA.md</code></strong>.</p>
+<h3 id="81-mapeamento-owasp-top-10-2021">8.1 Mapeamento OWASP Top 10 (2021)</h3>
+<table>
+<thead>
+<tr>
+<th>Risco OWASP</th>
+<th style="text-align: center;">Status</th>
+<th>Principais controles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A01</strong> Broken Access Control</td>
+<td style="text-align: center;">✅</td>
+<td><code>@login_required</code>, mixins de papel, filtro no queryset, proteção <em>open redirect</em></td>
+</tr>
+<tr>
+<td><strong>A02</strong> Cryptographic Failures</td>
+<td style="text-align: center;">✅*</td>
+<td>Hash PBKDF2+SHA-256; <em>flags HTTPS recomendadas para produção</em></td>
+</tr>
+<tr>
+<td><strong>A03</strong> Injection</td>
+<td style="text-align: center;">✅</td>
+<td>ORM parametrizado, sanitização em 3 camadas, auto-escape</td>
+</tr>
+<tr>
+<td><strong>A04</strong> Insecure Design</td>
+<td style="text-align: center;">✅</td>
+<td>Transações atômicas, validação no model, separação de camadas</td>
+</tr>
+<tr>
+<td><strong>A05</strong> Security Misconfiguration</td>
+<td style="text-align: center;">✅*</td>
+<td>Cabeçalhos HTTP de segurança; <em>endurecimento p/ produção</em></td>
+</tr>
+<tr>
+<td><strong>A06</strong> Vulnerable Components</td>
+<td style="text-align: center;">✅*</td>
+<td>Dependências mínimas (apenas Django)</td>
+</tr>
+<tr>
+<td><strong>A07</strong> Authentication Failures</td>
+<td style="text-align: center;">✅</td>
+<td>Login por e-mail, hash forte, sem enumeração</td>
+</tr>
+<tr>
+<td><strong>A08</strong> Data Integrity Failures</td>
+<td style="text-align: center;">✅</td>
+<td>CSRF global, cookies HttpOnly</td>
+</tr>
+<tr>
+<td><strong>A09</strong> Logging Failures</td>
+<td style="text-align: center;">✅</td>
+<td>Logs estruturados com PII mascarada</td>
+</tr>
+<tr>
+<td><strong>A10</strong> SSRF</td>
+<td style="text-align: center;">✅</td>
+<td>Não aplicável (sem requisições a URLs externas)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>* Mitigado no código; itens marcados possuem recomendações adicionais para o
+ambiente de produção (detalhadas em <code>SEGURANCA.md</code>, seção 16).</p>
+</blockquote>
+<h3 id="82-principais-controles-implementados">8.2 Principais Controles Implementados</h3>
+<p><strong>Validação e Sanitização de Entrada (A03)</strong>
+Toda entrada de texto passa por sanitização em múltiplas camadas: remoção de
+caracteres de controle, remoção de blocos perigosos (<code>&lt;script&gt;</code>, <code>&lt;iframe&gt;</code>) e
+<code>strip_tags()</code>. A validação ocorre <strong>no servidor</strong>, nunca confiando apenas no
+navegador.</p>
+<p><strong>Controle de Acesso (A01)</strong>
+A autorização é centralizada em funções e mixins reutilizáveis
+(<code>_is_room_manager</code>, <code>_can_manage_reservation</code>, <code>StaffRequiredMixin</code>), evitando
+inconsistências. Usuários só acessam seus próprios recursos.</p>
+<p><strong>Autenticação Segura (A07)</strong>
+Senhas com hash PBKDF2 (870.000 iterações + sal aleatório), validadores de força
+e proteção contra enumeração de usuários por mensagens genéricas.</p>
+<p><strong>Proteção contra SQL Injection (A03)</strong>
+100% do acesso ao banco usa o <strong>ORM do Django</strong>, que parametriza todas as
+queries automaticamente. Nenhuma query SQL é construída por concatenação.</p>
+<p><strong>Proteção CSRF (A08)</strong>
+Todas as ações de mutação (criar, editar, cancelar, ativar) exigem token CSRF.
+Cookies de sessão e CSRF são marcados como <code>HttpOnly</code>.</p>
+<p><strong>Cabeçalhos de Segurança HTTP (A05)</strong></p>
+<pre><code class="language-python">SECURE_CONTENT_TYPE_NOSNIFF = True      # Anti MIME-sniffing
+X_FRAME_OPTIONS = 'DENY'                # Anti-clickjacking
+SESSION_COOKIE_HTTPONLY = True          # Cookie de sessão protegido
+CSRF_COOKIE_HTTPONLY = True             # Token CSRF protegido
+SECURE_REFERRER_POLICY = 'same-origin'  # Controle de Referer
+</code></pre>
+<hr />
+<h2 id="9-sistema-de-logs-e-auditoria">9. Sistema de Logs e Auditoria</h2>
+<p>O sistema registra eventos relevantes para auditoria, usando o módulo <code>logging</code>
+nativo do Python. Os logs são gravados simultaneamente no <strong>terminal</strong> e no
+arquivo <strong><code>logs/application.log</code></strong>.</p>
+<h3 id="91-formato-dos-registros">9.1 Formato dos Registros</h3>
+<pre><code>2026-06-28 14:32:10 | INFO | Login realizado com sucesso: a***n@reservasegura.com
+</code></pre>
+<p>Cada registro contém: data/hora, nível (INFO/WARNING/ERROR) e mensagem.</p>
+<h3 id="92-eventos-auditados">9.2 Eventos Auditados</h3>
+<table>
+<thead>
+<tr>
+<th>Evento</th>
+<th>Nível</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Login bem-sucedido / inválido</td>
+<td>INFO / WARNING</td>
+</tr>
+<tr>
+<td>Logout</td>
+<td>INFO</td>
+</tr>
+<tr>
+<td>Cadastro de usuário</td>
+<td>INFO</td>
+</tr>
+<tr>
+<td>Criação / edição / ativação de sala</td>
+<td>INFO</td>
+</tr>
+<tr>
+<td>Criação / cancelamento de reserva</td>
+<td>INFO</td>
+</tr>
+<tr>
+<td>Tentativa de reservar sala inativa</td>
+<td>WARNING</td>
+</tr>
+<tr>
+<td>Tentativa de acesso sem permissão</td>
+<td>WARNING</td>
+</tr>
+<tr>
+<td>Erros inesperados</td>
+<td>ERROR (com <em>stack trace</em>)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="93-protecao-de-dados-pessoais-lgpd">9.3 Proteção de Dados Pessoais (LGPD)</h3>
+<p>Em conformidade com a LGPD, <strong>endereços de e-mail são mascarados</strong> antes de
+serem registrados, através da função <code>mask_email()</code>:</p>
+<pre><code>admin@reservasegura.com  →  a***n@reservasegura.com
+jo@email.com             →  j*@email.com
+</code></pre>
+<p>O domínio é preservado (útil para auditoria), mas a parte que identifica a
+pessoa é ocultada, reduzindo a exposição de dados pessoais nos arquivos de log
+(OWASP A09 — <em>Security Logging Failures</em>).</p>
+<hr />
+<h2 id="10-instalacao-e-execucao">10. Instalação e Execução</h2>
+<h3 id="101-pre-requisitos">10.1 Pré-requisitos</h3>
+<ul>
+<li>Python 3.13 ou superior</li>
+<li>pip (gerenciador de pacotes do Python)</li>
+</ul>
+<h3 id="102-passo-a-passo">10.2 Passo a Passo</h3>
+<pre><code class="language-bash"># 1. Criar e ativar o ambiente virtual
+python -m venv venv
+venv\Scripts\activate          # Windows
+# source venv/bin/activate     # Linux/Mac
+
+# 2. Instalar as dependências
+pip install -r requirements.txt
+
+# 3. Aplicar as migrações (cria o banco de dados)
+python manage.py migrate
+
+# 4. Criar um usuário administrador
+python manage.py createsuperuser
+
+# 5. Iniciar o servidor de desenvolvimento
+python manage.py runserver
+</code></pre>
+<p>Após iniciar, a aplicação estará disponível em <strong>http://127.0.0.1:8000/</strong> e o
+painel administrativo em <strong>http://127.0.0.1:8000/admin/</strong>.</p>
+<hr />
+<h2 id="11-comandos-de-gestao">11. Comandos de Gestão</h2>
+<h3 id="111-expiracao-de-reservas">11.1 Expiração de Reservas</h3>
+<p>O sistema inclui um comando customizado para marcar reservas vencidas como
+expiradas. Embora a expiração também ocorra automaticamente ao visualizar as
+reservas, este comando permite o agendamento via <strong>cron</strong> (Linux) ou
+<strong>Agendador de Tarefas</strong> (Windows), sem depender de filas externas.</p>
+<pre><code class="language-bash">python manage.py expire_reservations
+# Saída: &quot;3 reserva(s) expirada(s).&quot;
+</code></pre>
+<h3 id="112-verificacao-de-integridade">11.2 Verificação de Integridade</h3>
+<pre><code class="language-bash">python manage.py check          # Verifica problemas no projeto
+python manage.py makemigrations # Gera migrações após mudar models
+python manage.py migrate        # Aplica migrações ao banco
+</code></pre>
+<hr />
+<h2 id="12-consideracoes-finais">12. Considerações Finais</h2>
+<p>O <strong>Sistema de Reserva Segura</strong> demonstra a aplicação prática dos conceitos de
+<strong>programação segura</strong> em um projeto Django real. Mais do que entregar as
+funcionalidades de reserva de salas, o projeto prioriza <strong>como</strong> essas
+funcionalidades são implementadas:</p>
+<ul>
+<li><strong>8 dos 10 riscos</strong> do OWASP Top 10 são mitigados diretamente no código.</li>
+<li>As <strong>14 categorias</strong> de práticas seguras da OWASP foram consideradas e
+  documentadas.</li>
+<li>A <strong>defesa em profundidade</strong> garante que a falha de uma camada seja contida
+  pelas demais.</li>
+<li>A <strong>proteção de dados pessoais</strong> atende aos princípios da LGPD.</li>
+</ul>
+<p>O projeto também documenta, de forma transparente, as <strong>melhorias recomendadas
+para um ambiente de produção</strong> (configuração de HTTPS/HSTS, rate limiting,
+Content-Security-Policy, e auditoria de dependências), demonstrando consciência
+de que a segurança é um processo contínuo, não um estado final.</p>
+<h3 id="documentos-complementares">Documentos Complementares</h3>
+<ul>
+<li><strong><code>docs/SEGURANCA.md</code></strong> — Documentação técnica detalhada de segurança, com
+  mapeamento completo das 14 categorias OWASP e do Top 10, trechos de código e
+  sugestões de melhoria.</li>
+<li><strong><code>docs/Reserva-Segura-Apresentacao.pptx</code></strong> — Apresentação de slides do projeto.</li>
+</ul>
+<hr />
+<p><em>Documento elaborado para fins acadêmicos — IFPB · Tecnologia em Sistemas para Internet · Junho de 2026.</em></p>
+</div>
+<div class="hint">Clique em <b>Baixar PDF</b> e escolha "Salvar como PDF" como destino</div>
+<script>
+  // Atalho Ctrl+P tambem funciona; abre o dialogo de impressao do navegador.
+  document.addEventListener('keydown', function(e){
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='p'){ /* deixa o navegador agir */ }
+  });
+</script>
+</body></html>
