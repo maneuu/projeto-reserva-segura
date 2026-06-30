@@ -1,98 +1,78 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Criar conta | Sistema de Reserva</title>
-  <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}">
-</head>
+{% block title %}Criar conta | Reserva Segura IFPB{% endblock %}
 
-<body>
-  <main class="auth-card">
-    <div class="page-header">
-      <div>
-        <h1 class="auth-title">Criar conta</h1>
-        <p class="auth-subtitle">Preencha seus dados para acessar o sistema.</p>
+{% block main_class %}site-main--center{% endblock %}
+
+{% block content %}
+<section class="auth-card auth-card--wide">
+  <div class="auth-icon"><i class="fa-solid fa-user-plus"></i></div>
+  <h1 class="auth-title">Criar conta</h1>
+  <p class="auth-subtitle">Preencha seus dados para acessar o sistema de reservas.</p>
+
+  {% if form.non_field_errors %}
+  <div class="form-error-block" role="alert">
+    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+    <ul class="field-errors">
+      {% for error in form.non_field_errors %}
+      <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <form method="post" class="form" novalidate>
+    {% csrf_token %}
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="id_first_name">Nome</label>
+        <input type="text" id="id_first_name" name="first_name" value="{{ form.first_name.value|default_if_none:'' }}" autocomplete="given-name" required maxlength="150">
+        {% for error in form.first_name.errors %}
+        <ul class="field-errors"><li>{{ error }}</li></ul>
+        {% endfor %}
       </div>
 
-      <nav class="page-links" aria-label="Navegação">
-        <a class="page-link" href="{% url 'home' %}">Home</a>
-        <a class="page-link" href="{% url 'accounts:login' %}">Login</a>
-      </nav>
+      <div class="field">
+        <label for="id_last_name">Sobrenome</label>
+        <input type="text" id="id_last_name" name="last_name" value="{{ form.last_name.value|default_if_none:'' }}" autocomplete="family-name" required maxlength="150">
+        {% for error in form.last_name.errors %}
+        <ul class="field-errors"><li>{{ error }}</li></ul>
+        {% endfor %}
+      </div>
+
+      <div class="field field--full">
+        <label for="id_email">E-mail</label>
+        <input type="email" id="id_email" name="email" value="{{ form.email.value|default_if_none:'' }}" autocomplete="email" required maxlength="254">
+        {% for error in form.email.errors %}
+        <ul class="field-errors"><li>{{ error }}</li></ul>
+        {% endfor %}
+      </div>
+
+      <div class="field">
+        <label for="id_password1">Senha</label>
+        <input type="password" id="id_password1" name="password1" autocomplete="new-password" required maxlength="128">
+        {% for error in form.password1.errors %}
+        <ul class="field-errors"><li>{{ error }}</li></ul>
+        {% endfor %}
+      </div>
+
+      <div class="field">
+        <label for="id_password2">Confirmar senha</label>
+        <input type="password" id="id_password2" name="password2" autocomplete="new-password" required maxlength="128">
+        {% for error in form.password2.errors %}
+        <ul class="field-errors"><li>{{ error }}</li></ul>
+        {% endfor %}
+      </div>
     </div>
 
-    <form method="post" class="auth-form" novalidate>
-      {% csrf_token %}
+    <button type="submit" class="btn btn-primary btn-block">
+      <i class="fa-solid fa-user-plus"></i> Criar conta
+    </button>
+  </form>
 
-      {% if form.non_field_errors %}
-      <ul class="form-errors">
-        {% for error in form.non_field_errors %}
-        <li>{{ error }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-
-      <div class="form-grid">
-        <div class="field-group">
-          <label for="id_first_name">Nome</label>
-          <input type="text" id="id_first_name" name="first_name" value="{{ form.first_name.value|default_if_none:'' }}" autocomplete="given-name" required maxlength="150">
-          {% for error in form.first_name.errors %}
-          <ul class="error-list">
-            <li>{{ error }}</li>
-          </ul>
-          {% endfor %}
-        </div>
-
-        <div class="field-group">
-          <label for="id_last_name">Sobrenome</label>
-          <input type="text" id="id_last_name" name="last_name" value="{{ form.last_name.value|default_if_none:'' }}" autocomplete="family-name" required maxlength="150">
-          {% for error in form.last_name.errors %}
-          <ul class="error-list">
-            <li>{{ error }}</li>
-          </ul>
-          {% endfor %}
-        </div>
-
-        <div class="field-group">
-          <label for="id_email">E-mail</label>
-          <input type="email" id="id_email" name="email" value="{{ form.email.value|default_if_none:'' }}" autocomplete="email" required maxlength="254">
-          {% for error in form.email.errors %}
-          <ul class="error-list">
-            <li>{{ error }}</li>
-          </ul>
-          {% endfor %}
-        </div>
-
-        <div class="field-group">
-          <label for="id_password1">Senha</label>
-          <input type="password" id="id_password1" name="password1" autocomplete="new-password" required maxlength="128">
-          {% for error in form.password1.errors %}
-          <ul class="error-list">
-            <li>{{ error }}</li>
-          </ul>
-          {% endfor %}
-        </div>
-
-        <div class="field-group">
-          <label for="id_password2">Confirmar senha</label>
-          <input type="password" id="id_password2" name="password2" autocomplete="new-password" required maxlength="128">
-          {% for error in form.password2.errors %}
-          <ul class="error-list">
-            <li>{{ error }}</li>
-          </ul>
-          {% endfor %}
-        </div>
-      </div>
-
-      <button type="submit" class="submit-btn">Criar conta</button>
-    </form>
-
-    <p class="auth-footer">
-      Já tem cadastro? <a href="{% url 'accounts:login' %}">Entrar</a>
-    </p>
-  </main>
-</body>
-
-</html>
+  <p class="auth-footer">
+    Já tem cadastro? <a href="{% url 'accounts:login' %}">Entrar</a>
+  </p>
+</section>
+{% endblock %}

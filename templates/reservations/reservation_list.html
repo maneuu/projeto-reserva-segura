@@ -1,71 +1,67 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Minhas Reservas</title>
-  <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}">
-</head>
+{% block title %}Minhas reservas | Reserva Segura IFPB{% endblock %}
 
-<body>
-  <main class="auth-card wide">
-    <div class="page-header">
-      <div>
-        <h1 class="auth-title">Minhas reservas</h1>
-        {% if is_admin_view %}
-        <p class="auth-subtitle">Você está visualizando todas as reservas por ser administrador.</p>
-        {% else %}
-        <p class="auth-subtitle">Reservas vinculadas ao seu usuário.</p>
-        {% endif %}
-      </div>
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow"><i class="fa-solid fa-calendar-check"></i> Reservas</p>
+    <h1>Minhas reservas</h1>
+    {% if is_admin_view %}
+    <p class="subtitle">Você está visualizando todas as reservas por ser administrador.</p>
+    {% else %}
+    <p class="subtitle">Reservas vinculadas ao seu usuário.</p>
+    {% endif %}
+  </div>
+  <div class="head-actions">
+    <a href="{% url 'rooms:room_list' %}" class="btn btn-primary"><i class="fa-solid fa-calendar-plus"></i> Reservar nova sala</a>
+  </div>
+</div>
 
-      <nav class="page-links" aria-label="Navegação">
-        <a class="page-link" href="{% url 'home' %}">Home</a>
-        <a class="page-link" href="{% url 'rooms:room_list' %}">Reservar nova sala</a>
-      </nav>
+{% if reservations %}
+<ul class="data-list">
+  {% for reservation in reservations %}
+  <li class="data-item {% if reservation.status == 'CANCELED' %}is-cancelled{% elif reservation.status == 'EXPIRED' %}is-expired{% endif %}">
+    <div class="data-item__title">
+      <i class="fa-solid fa-door-closed"></i> {{ reservation.room.name }}
+      {% if reservation.status == 'ACTIVE' %}
+      <span class="badge badge-available">{{ reservation.get_status_display }}</span>
+      {% elif reservation.status == 'EXPIRED' %}
+      <span class="badge badge-expired"><i class="fa-solid fa-clock-rotate-left"></i> {{ reservation.get_status_display }}</span>
+      {% else %}
+      <span class="badge badge-unavailable">{{ reservation.get_status_display }}</span>
+      {% endif %}
     </div>
 
-    {% if messages %}
-    {% for message in messages %}
-    <div class="info-banner">{{ message }}</div>
-    {% endfor %}
+    <div class="data-meta">
+      <i class="fa-solid fa-clock"></i>
+      {{ reservation.start_datetime|date:"d/m/Y H:i" }} até {{ reservation.end_datetime|date:"d/m/Y H:i" }}
+    </div>
+    {% if is_admin_view %}
+    <div class="data-meta"><i class="fa-solid fa-user"></i> <strong>Usuário:</strong> {{ reservation.user.get_full_name|default:reservation.user.email }}</div>
+    {% endif %}
+    {% if reservation.description %}
+    <div class="data-meta"><i class="fa-solid fa-align-left"></i> {{ reservation.description }}</div>
     {% endif %}
 
-    {% if reservations %}
-    <ul class="reservation-list">
-      {% for reservation in reservations %}
-      <li class="reservation-item">
-        <strong>{{ reservation.room.name }}</strong>
-        <div class="reservation-meta">
-          {{ reservation.start_datetime|date:"d/m/Y H:i" }} até {{ reservation.end_datetime|date:"d/m/Y H:i" }}
-        </div>
-        <div class="reservation-meta"><strong>Status:</strong> {{ reservation.get_status_display }}</div>
-        {% if is_admin_view %}
-        <div class="reservation-meta"><strong>Usuário:</strong> {{ reservation.user.get_full_name|default:reservation.user.username }}</div>
-        {% endif %}
-        {% if reservation.description %}
-        <div class="reservation-meta">{{ reservation.description }}</div>
-        {% endif %}
-
-        <div class="reservation-actions">
-          <a class="page-link" href="{% url 'reservations:reservation_detail' reservation.id %}">Ver detalhes</a>
-          {% if reservation.status == 'ACTIVE' %}
-          <form method="post" action="{% url 'reservations:reservation_cancel' reservation.id %}">
-            {% csrf_token %}
-            <button type="submit" class="submit-btn submit-btn-small">Cancelar</button>
-          </form>
-          {% endif %}
-        </div>
-      </li>
-      {% endfor %}
-    </ul>
-    {% else %}
-    <p class="reservation-meta">Você ainda não possui reservas cadastradas.</p>
-    {% endif %}
-
-  </main>
-</body>
-
-</html>
+    <div class="data-actions">
+      <a class="btn btn-secondary btn-sm" href="{% url 'reservations:reservation_detail' reservation.id %}"><i class="fa-solid fa-circle-info"></i> Ver detalhes</a>
+      {% if reservation.status == 'ACTIVE' %}
+      <form method="post" action="{% url 'reservations:reservation_cancel' reservation.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-xmark"></i> Cancelar</button>
+      </form>
+      {% endif %}
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="empty-state">
+  <i class="fa-solid fa-calendar-xmark"></i>
+  <h3>Nenhuma reserva ainda</h3>
+  <p>Você ainda não possui reservas cadastradas. Que tal reservar uma sala?</p>
+  <a href="{% url 'rooms:room_list' %}" class="btn btn-primary"><i class="fa-solid fa-calendar-plus"></i> Reservar sala</a>
+</div>
+{% endif %}
+{% endblock %}

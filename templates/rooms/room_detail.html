@@ -1,88 +1,61 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ room.name }} | Detalhes da Sala</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'rooms/css/room_list.css' %}">
-</head>
+{% block title %}{{ room.name }} | Detalhes da Sala{% endblock %}
 
-<body>
-  <main class="rooms-page">
-    <header class="rooms-header">
-      <div>
-        <p class="eyebrow">Detalhes da sala</p>
-        <h1>{{ room.name }}</h1>
-        <p class="subtitle">Verifique informações e inicie uma reserva segura.</p>
-      </div>
-      <div class="header-actions">
-        {% if request.user.is_staff %}
-        <a href="{% url 'rooms:room_update' room.id %}" class="btn btn-primary">Editar sala</a>
-        {% endif %}
-        <a href="{% url 'rooms:room_list' %}" class="btn btn-secondary">Voltar para salas</a>
-      </div>
-    </header>
-
-    {% if messages %}
-    {% for message in messages %}
-    <div class="info-banner">{{ message }}</div>
-    {% endfor %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow"><i class="fa-solid fa-door-open"></i> Detalhes da sala</p>
+    <h1>{{ room.name }}</h1>
+    <p class="subtitle">Verifique informações e inicie uma reserva segura.</p>
+  </div>
+  <div class="head-actions">
+    {% if request.user.is_staff %}
+    <a href="{% url 'rooms:room_update' room.id %}" class="btn btn-primary"><i class="fa-solid fa-pen"></i> Editar sala</a>
     {% endif %}
+    <a href="{% url 'rooms:room_list' %}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Voltar para salas</a>
+  </div>
+</div>
 
-    <section class="room-detail-card">
-      <div class="room-detail-grid">
-        <div>
-          <p><strong>Localização:</strong> {{ room.location }}</p>
-          <p><strong>Capacidade:</strong> {{ room.capacity }} pessoas</p>
-          <p><strong>Recursos:</strong>
-            {% if room.resources %}
-            {{ room.resources }}
-            {% else %}
-            Não informado.
-            {% endif %}
-          </p>
-          <p><strong>Descrição:</strong>
-            {% if room.description %}
-            {{ room.description }}
-            {% else %}
-            Sem descrição adicional.
-            {% endif %}
-          </p>
-        </div>
-        <div class="room-status-panel">
-          {% if not room.is_active %}
-          <span class="status-badge status-unavailable">Sala inativa</span>
-          <p>Esta sala está desativada e não pode ser reservada.</p>
-          {% elif is_available %}
-          <span class="status-badge status-available">Disponível agora</span>
-          <p>Esta sala está livre no momento atual.</p>
-          <a href="{% url 'reservations:reservation_create_for_room' room.id %}" class="btn btn-primary">Reservar sala</a>
-          {% else %}
-          <span class="status-badge status-unavailable">Indisponível agora</span>
-          <p>Existe uma reserva ativa para esta sala neste momento.</p>
-          <button class="btn btn-disabled" type="button" disabled>Indisponível no momento</button>
-          {% endif %}
+<section class="panel">
+  <div class="room-detail-grid">
+    <div>
+      <p><i class="fa-solid fa-location-dot"></i> <strong>Localização:</strong> {{ room.location }}</p>
+      <p><i class="fa-solid fa-users"></i> <strong>Capacidade:</strong> {{ room.capacity }} pessoas</p>
+      <p><i class="fa-solid fa-screwdriver-wrench"></i> <strong>Recursos:</strong>
+        {% if room.resources %}{{ room.resources }}{% else %}Não informado.{% endif %}
+      </p>
+      <p><i class="fa-solid fa-align-left"></i> <strong>Descrição:</strong>
+        {% if room.description %}{{ room.description }}{% else %}Sem descrição adicional.{% endif %}
+      </p>
+    </div>
 
-          {% if request.user.is_staff %}
-          <form method="post" action="{% url 'rooms:room_toggle_active' room.id %}" class="room-admin-actions">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            {% if room.is_active %}
-            <button type="submit" class="btn btn-disabled">Desativar sala</button>
-            {% else %}
-            <button type="submit" class="btn btn-primary">Ativar sala</button>
-            {% endif %}
-          </form>
-          {% endif %}
-        </div>
-      </div>
-    </section>
-  </main>
-</body>
+    <div class="room-status-panel {% if not room.is_active or not is_available %}is-unavailable{% endif %}">
+      {% if not room.is_active %}
+      <span class="badge badge-neutral">Sala inativa</span>
+      <p>Esta sala está desativada e não pode ser reservada.</p>
+      {% elif is_available %}
+      <span class="badge badge-available">Disponível agora</span>
+      <p>Esta sala está livre no momento atual.</p>
+      <a href="{% url 'reservations:reservation_create_for_room' room.id %}" class="btn btn-primary"><i class="fa-solid fa-calendar-plus"></i> Reservar sala</a>
+      {% else %}
+      <span class="badge badge-unavailable">Indisponível agora</span>
+      <p>Existe uma reserva ativa para esta sala neste momento.</p>
+      <button class="btn btn-disabled" type="button" disabled>Indisponível no momento</button>
+      {% endif %}
 
-</html>
+      {% if request.user.is_staff %}
+      <form method="post" action="{% url 'rooms:room_toggle_active' room.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        {% if room.is_active %}
+        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-ban"></i> Desativar sala</button>
+        {% else %}
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-circle-check"></i> Ativar sala</button>
+        {% endif %}
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

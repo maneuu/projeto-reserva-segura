@@ -1,24 +1,19 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acesso negado | Reserva Segura</title>
-  <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}">
-</head>
+{% block title %}Acesso negado | Reserva Segura IFPB{% endblock %}
 
-<body>
-  <main class="auth-card">
-    <h1 class="auth-title">Acesso negado</h1>
-    <p class="auth-subtitle">
-      Você não tem permissão para acessar esta página. Esta área é restrita aos administradores do sistema.
-    </p>
-    <p class="auth-footer">
-      <a href="{% url 'home' %}">Voltar para a página inicial</a>
-    </p>
-  </main>
-</body>
+{% block main_class %}site-main--center{% endblock %}
 
-</html>
+{% block content %}
+<section class="auth-card">
+  <div class="auth-icon auth-icon--danger"><i class="fa-solid fa-lock"></i></div>
+  <h1 class="auth-title">Acesso negado</h1>
+  <p class="auth-subtitle">
+    Você não tem permissão para acessar esta página. Esta área é restrita aos
+    administradores do sistema.
+  </p>
+  <a href="{% url 'home' %}" class="btn btn-primary btn-block">
+    <i class="fa-solid fa-house"></i> Voltar para a página inicial
+  </a>
+</section>
+{% endblock %}

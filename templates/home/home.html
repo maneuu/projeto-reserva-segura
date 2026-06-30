@@ -1,73 +1,51 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistema de Reserva de Salas</title>
+{% block title %}Início | Reserva Segura IFPB{% endblock %}
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
-  <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
-  <script src="{% static 'home/js/home.js' %}" defer></script>
-</head>
+{% block extra_scripts %}
+<script src="{% static 'home/js/home.js' %}" defer></script>
+{% endblock %}
 
-<body>
-  <main class="dashboard-container">
+{% block content %}
+<section class="hero">
+  <p class="eyebrow eyebrow--light"><i class="fa-solid fa-leaf"></i> Instituto Federal da Paraíba</p>
+  <h1>Sistema de Reserva de Salas</h1>
+  <p>Gerencie os espaços acadêmicos do campus com segurança: consulte a disponibilidade,
+    agende sem conflitos e acompanhe suas reservas em um só lugar.</p>
+</section>
 
-    <header class="dashboard-header">
-      <div class="header-titles">
-        <h1>Sistema de Reserva de Salas</h1>
-        <p>Gerenciamento de espaços acadêmicos - Sistemas para Internet</p>
-      </div>
+<nav class="feature-grid">
+  <a href="{% url 'rooms:room_list' %}" class="feature-card animate-card">
+    <span class="feature-card__icon"><i class="fa-solid fa-building-columns"></i></span>
+    <span class="feature-card__title">Ver salas</span>
+    <span class="feature-card__desc">Consulte a disponibilidade de salas no campus em tempo real.</span>
+    <span class="feature-card__arrow">Acessar <i class="fa-solid fa-arrow-right"></i></span>
+  </a>
 
-      <div class="header-auth">
-        {% if request.user.is_authenticated %}
-        <div class="user-profile">
-          <i class="fa-solid fa-circle-user" aria-hidden="true"></i>
+  {% if request.user.is_authenticated %}
+  <a href="{% url 'reservations:reservation_list' %}" class="feature-card animate-card">
+    <span class="feature-card__icon"><i class="fa-solid fa-calendar-check"></i></span>
+    <span class="feature-card__title">Minhas reservas</span>
+    <span class="feature-card__desc">Acompanhe, detalhe e cancele seus agendamentos.</span>
+    <span class="feature-card__arrow">Acessar <i class="fa-solid fa-arrow-right"></i></span>
+  </a>
+  {% else %}
+  <a href="{% url 'accounts:login' %}" class="feature-card animate-card">
+    <span class="feature-card__icon"><i class="fa-solid fa-right-to-bracket"></i></span>
+    <span class="feature-card__title">Entrar no sistema</span>
+    <span class="feature-card__desc">Acesse com seu e-mail e senha para começar a reservar.</span>
+    <span class="feature-card__arrow">Acessar <i class="fa-solid fa-arrow-right"></i></span>
+  </a>
+  {% endif %}
 
-          <span class="user-name">{{ request.user.first_name|default:request.user.email }}</span>
-
-          <form action="{% url 'accounts:logout' %}" method="post" class="logout-form">
-            {% csrf_token %}
-            <button type="submit" class="btn-icon" title="Sair" aria-label="Sair">
-              <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
-            </button>
-          </form>
-        </div>
-        {% else %}
-        <a href="{% url 'accounts:login' %}" class="btn-login">
-          <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
-          Entrar
-        </a>
-        {% endif %}
-      </div>
-    </header>
-
-    <nav class="action-cards">
-      <a href="{% url 'rooms:room_list' %}" class="card animate-card">
-        <span class="card-icon" aria-hidden="true"><i class="fa-solid fa-building-columns"></i></span>
-        <span class="card-title">Ver Salas</span>
-        <span class="card-desc">Consulte a disponibilidade de salas no campus.</span>
-      </a>
-
-      {% if request.user.is_authenticated %}
-      <a href="{% url 'reservations:reservation_list' %}" class="card animate-card">
-        <span class="card-icon" aria-hidden="true"><i class="fa-solid fa-calendar-check"></i></span>
-        <span class="card-title">Minhas Reservas</span>
-        <span class="card-desc">Acompanhe e gerencie seus agendamentos.</span>
-      </a>
-      {% endif %}
-
-      {% if request.user.is_staff %}
-      <a href="{% url 'admin:index' %}" class="card animate-card">
-        <span class="card-icon" aria-hidden="true"><i class="fa-solid fa-gear"></i></span>
-        <span class="card-title">Administração</span>
-        <span class="card-desc">Gestão de usuários, salas e configurações.</span>
-      </a>
-      {% endif %}
-    </nav>
-  </main>
-</body>
-
-</html>
+  {% if request.user.is_staff %}
+  <a href="{% url 'admin:index' %}" class="feature-card feature-card--admin animate-card">
+    <span class="feature-card__icon"><i class="fa-solid fa-gear"></i></span>
+    <span class="feature-card__title">Administração</span>
+    <span class="feature-card__desc">Gestão de usuários, salas e configurações do sistema.</span>
+    <span class="feature-card__arrow">Acessar <i class="fa-solid fa-arrow-right"></i></span>
+  </a>
+  {% endif %}
+</nav>
+{% endblock %}

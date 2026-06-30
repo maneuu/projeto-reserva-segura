@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2f9e41">
+  <title>{% block title %}Reserva Segura | IFPB{% endblock %}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="{% static 'css/ifpb-theme.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+  {% block navbar %}
+  <header class="site-nav">
+    <div class="site-nav__inner">
+      <a href="{% url 'home' %}" class="brand" aria-label="Início — Reserva Segura IFPB">
+        <span class="brand__logo"><i class="fa-solid fa-building-columns" aria-hidden="true"></i></span>
+        <span class="brand__text">
+          <span class="brand__title">Reserva Segura</span>
+          <span class="brand__subtitle">IFPB &middot; Sistemas para Internet</span>
+        </span>
+      </a>
+
+      <nav class="nav-links" aria-label="Navegação principal">
+        <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}is-active{% endif %}">
+          <i class="fa-solid fa-house" aria-hidden="true"></i> Início
+        </a>
+        <a href="{% url 'rooms:room_list' %}" class="nav-link {% if request.resolver_match.app_name == 'rooms' %}is-active{% endif %}">
+          <i class="fa-solid fa-door-open" aria-hidden="true"></i> Salas
+        </a>
+        {% if request.user.is_authenticated %}
+        <a href="{% url 'reservations:reservation_list' %}" class="nav-link {% if request.resolver_match.app_name == 'reservations' %}is-active{% endif %}">
+          <i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Minhas reservas
+        </a>
+        {% endif %}
+        {% if request.user.is_staff %}
+        <a href="{% url 'admin:index' %}" class="nav-link">
+          <i class="fa-solid fa-gear" aria-hidden="true"></i> Administração
+        </a>
+        {% endif %}
+
+        {% if request.user.is_authenticated %}
+        <span class="nav-user">
+          <i class="fa-solid fa-circle-user" aria-hidden="true"></i>
+          {{ request.user.first_name|default:request.user.email }}
+          <form action="{% url 'accounts:logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="nav-logout" title="Sair" aria-label="Sair">
+              <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+            </button>
+          </form>
+        </span>
+        {% else %}
+        <a href="{% url 'accounts:login' %}" class="nav-link nav-cta">
+          <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> Entrar
+        </a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+  {% endblock %}
+
+  <main class="site-main {% block main_class %}{% endblock %}">
+    {% block messages %}
+    {% if messages %}
+    <div class="alerts">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }}">
+        <i class="fa-solid {% if 'success' in message.tags %}fa-circle-check{% elif 'error' in message.tags %}fa-circle-exclamation{% elif 'warning' in message.tags %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}" aria-hidden="true"></i>
+        <span>{{ message }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endblock %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  {% block footer %}
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <span><strong>IFPB</strong> <span class="dot">&#9679;</span> Sistema de Reserva Segura</span>
+      <span>Instituto Federal da Paraíba <span class="dot--red">&#9679;</span> Uso acadêmico</span>
+    </div>
+  </footer>
+  {% endblock %}
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+
+</html>

@@ -1,152 +1,124 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salas | Reserva Segura</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
-  <link rel="stylesheet" href="{% static 'rooms/css/room_list.css' %}">
-</head>
+{% block title %}Salas | Reserva Segura IFPB{% endblock %}
 
-<body>
-  <main class="rooms-page">
-    <header class="rooms-header">
-      <div>
-        <p class="eyebrow">Painel acadêmico</p>
-        <h1>Salas cadastradas</h1>
-        <p class="subtitle">Busque por nome, filtre por status e inicie reservas sem conflito.</p>
-      </div>
-      <div class="header-actions">
-        {% if request.user.is_staff %}
-        <a href="{% url 'rooms:room_create' %}" class="btn btn-primary">Cadastrar sala</a>
-        {% endif %}
-        <a href="{% url 'home' %}" class="btn btn-secondary">Voltar para home</a>
-      </div>
-    </header>
-
-    {% if messages %}
-    {% for message in messages %}
-    <div class="info-banner">{{ message }}</div>
-    {% endfor %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow"><i class="fa-solid fa-building-columns"></i> Painel acadêmico</p>
+    <h1>Salas cadastradas</h1>
+    <p class="subtitle">Busque por nome, filtre por status e inicie reservas sem conflito.</p>
+  </div>
+  <div class="head-actions">
+    {% if request.user.is_staff %}
+    <a href="{% url 'rooms:room_create' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Cadastrar sala</a>
     {% endif %}
+    <a href="{% url 'home' %}" class="btn btn-secondary"><i class="fa-solid fa-house"></i> Início</a>
+  </div>
+</div>
 
-    <section class="filters-panel">
-      <form method="get" class="filters-form">
-        <div class="field-group">
-          <label for="search">Buscar sala</label>
-          <div class="input-icon">
-            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-            <input id="search" type="text" name="search" value="{{ search }}" placeholder="Ex.: Laboratório de Redes" maxlength="100">
-          </div>
-          {% for error in search_form.search.errors %}
-          <ul class="field-errors">
-            <li>{{ error }}</li>
-          </ul>
-          {% endfor %}
-        </div>
-
-        <div class="field-group">
-          <label for="status">Disponibilidade</label>
-          <select id="status" name="status">
-            <option value="all" {% if status_all %}selected{% endif %}>Todas as salas</option>
-            <option value="available" {% if status_available %}selected{% endif %}>Apenas disponíveis</option>
-            <option value="unavailable" {% if status_unavailable %}selected{% endif %}>Apenas indisponíveis</option>
-          </select>
-          {% for error in search_form.status.errors %}
-          <ul class="field-errors">
-            <li>{{ error }}</li>
-          </ul>
-          {% endfor %}
-        </div>
-
-        <button type="submit" class="btn btn-primary">Aplicar filtros</button>
-      </form>
-    </section>
-
-    <section class="rooms-grid">
-      {% for item in room_cards %}
-      <article class="room-card">
-        <div class="room-card-top">
-          <div>
-            <h2>{{ item.room.name }}</h2>
-            <p class="room-location"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ item.room.location }}</p>
-          </div>
-          {% if not item.room.is_active %}
-          <span class="status-badge status-unavailable">Inativa</span>
-          {% elif item.is_available %}
-          <span class="status-badge status-available">Disponível</span>
-          {% else %}
-          <span class="status-badge status-unavailable">Indisponível</span>
-          {% endif %}
-        </div>
-
-        <div class="room-meta">
-          <p><strong>Capacidade:</strong> {{ item.room.capacity }} pessoas</p>
-          <p><strong>Recursos:</strong>
-            {% if item.room.resources %}
-            {{ item.room.resources|truncatechars:100 }}
-            {% else %}
-            Não informado.
-            {% endif %}
-          </p>
-        </div>
-
-        <div class="room-actions">
-          <a href="{% url 'rooms:room_detail' item.room.id %}" class="btn btn-secondary">Ver detalhes</a>
-
-          {% if item.is_available %}
-          <a href="{% url 'reservations:reservation_create_for_room' item.room.id %}" class="btn btn-primary">Reservar sala</a>
-          {% elif item.room.is_active %}
-          <button class="btn btn-disabled" type="button" disabled>Indisponível no momento</button>
-          {% endif %}
-        </div>
-
-        {% if request.user.is_staff %}
-        <div class="room-actions room-admin-actions">
-          <a href="{% url 'rooms:room_update' item.room.id %}" class="btn btn-secondary">Editar</a>
-          <form method="post" action="{% url 'rooms:room_toggle_active' item.room.id %}">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            {% if item.room.is_active %}
-            <button type="submit" class="btn btn-disabled">Desativar</button>
-            {% else %}
-            <button type="submit" class="btn btn-primary">Ativar</button>
-            {% endif %}
-          </form>
-        </div>
-        {% endif %}
-      </article>
-      {% empty %}
-      <div class="empty-state">
-        <h3>Nenhuma sala encontrada</h3>
-        <p>Tente alterar os filtros de busca para visualizar outros resultados.</p>
+<section class="filters panel">
+  <form method="get" class="filters-form">
+    <div class="field">
+      <label for="search">Buscar sala</label>
+      <div class="input-icon">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input id="search" type="text" name="search" value="{{ search }}" placeholder="Ex.: Laboratório de Redes" maxlength="100">
       </div>
+      {% for error in search_form.search.errors %}
+      <ul class="field-errors"><li>{{ error }}</li></ul>
       {% endfor %}
-    </section>
+    </div>
 
-    {% if is_paginated %}
-    <nav class="pagination" aria-label="Paginação das salas">
-      {% if page_obj.has_previous %}
-      <a class="btn btn-secondary" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+    <div class="field">
+      <label for="status">Disponibilidade</label>
+      <select id="status" name="status">
+        <option value="all" {% if status_all %}selected{% endif %}>Todas as salas</option>
+        <option value="available" {% if status_available %}selected{% endif %}>Apenas disponíveis</option>
+        <option value="unavailable" {% if status_unavailable %}selected{% endif %}>Apenas indisponíveis</option>
+      </select>
+      {% for error in search_form.status.errors %}
+      <ul class="field-errors"><li>{{ error }}</li></ul>
+      {% endfor %}
+    </div>
+
+    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-filter"></i> Filtrar</button>
+  </form>
+</section>
+
+<section class="rooms-grid">
+  {% for item in room_cards %}
+  <article class="room-card">
+    <div class="room-card__top">
+      <div>
+        <h2>{{ item.room.name }}</h2>
+        <p class="room-location"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ item.room.location }}</p>
+      </div>
+      {% if not item.room.is_active %}
+      <span class="badge badge-neutral">Inativa</span>
+      {% elif item.is_available %}
+      <span class="badge badge-available">Disponível</span>
       {% else %}
-      <span class="btn btn-disabled" aria-disabled="true">Anterior</span>
+      <span class="badge badge-unavailable">Indisponível</span>
       {% endif %}
+    </div>
 
-      <span class="pagination-info">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    <div class="room-meta">
+      <p><i class="fa-solid fa-users"></i> <strong>Capacidade:</strong> {{ item.room.capacity }} pessoas</p>
+      <p><i class="fa-solid fa-screwdriver-wrench"></i> <strong>Recursos:</strong>
+        {% if item.room.resources %}{{ item.room.resources|truncatechars:100 }}{% else %}Não informado.{% endif %}
+      </p>
+    </div>
 
-      {% if page_obj.has_next %}
-      <a class="btn btn-secondary" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.next_page_number }}">Próxima</a>
-      {% else %}
-      <span class="btn btn-disabled" aria-disabled="true">Próxima</span>
+    <div class="room-actions">
+      <a href="{% url 'rooms:room_detail' item.room.id %}" class="btn btn-secondary btn-sm"><i class="fa-solid fa-circle-info"></i> Detalhes</a>
+
+      {% if item.is_available %}
+      <a href="{% url 'reservations:reservation_create_for_room' item.room.id %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-calendar-plus"></i> Reservar</a>
+      {% elif item.room.is_active %}
+      <button class="btn btn-disabled btn-sm" type="button" disabled>Indisponível</button>
       {% endif %}
-    </nav>
+    </div>
+
+    {% if request.user.is_staff %}
+    <div class="room-actions room-admin-actions">
+      <a href="{% url 'rooms:room_update' item.room.id %}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-pen"></i> Editar</a>
+      <form method="post" action="{% url 'rooms:room_toggle_active' item.room.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        {% if item.room.is_active %}
+        <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-ban"></i> Desativar</button>
+        {% else %}
+        <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-circle-check"></i> Ativar</button>
+        {% endif %}
+      </form>
+    </div>
     {% endif %}
-  </main>
-</body>
+  </article>
+  {% empty %}
+  <div class="empty-state">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <h3>Nenhuma sala encontrada</h3>
+    <p>Tente alterar os filtros de busca para visualizar outros resultados.</p>
+  </div>
+  {% endfor %}
+</section>
 
-</html>
+{% if is_paginated %}
+<nav class="pagination" aria-label="Paginação das salas">
+  {% if page_obj.has_previous %}
+  <a class="btn btn-secondary btn-sm" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.previous_page_number }}"><i class="fa-solid fa-arrow-left"></i> Anterior</a>
+  {% else %}
+  <span class="btn btn-disabled btn-sm" aria-disabled="true"><i class="fa-solid fa-arrow-left"></i> Anterior</span>
+  {% endif %}
+
+  <span class="pagination-info">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+
+  {% if page_obj.has_next %}
+  <a class="btn btn-secondary btn-sm" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.next_page_number }}">Próxima <i class="fa-solid fa-arrow-right"></i></a>
+  {% else %}
+  <span class="btn btn-disabled btn-sm" aria-disabled="true">Próxima <i class="fa-solid fa-arrow-right"></i></span>
+  {% endif %}
+</nav>
+{% endif %}
+{% endblock %}

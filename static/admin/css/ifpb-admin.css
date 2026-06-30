@@ -1,0 +1,205 @@
+/* =========================================================================
+   IFPB — Tema do painel administrativo do Django
+   Sobrescreve as variáveis de cor nativas do admin (Django 3.2+) com a
+   paleta institucional: verde #2f9e41, vermelho #cd191e, preto #000000.
+   ========================================================================= */
+
+:root {
+  --primary: #2f9e41;
+  --primary-fg: #ffffff;
+
+  --secondary: #237a31;
+  --accent: #cd191e;
+
+  --header-color: #ffffff;
+  --header-branding-color: #ffffff;
+  --header-bg: #2f9e41;
+  --header-link-color: #ffffff;
+
+  --breadcrumbs-fg: #e7f6ea;
+  --breadcrumbs-link-fg: #ffffff;
+  --breadcrumbs-bg: #237a31;
+
+  --link-fg: #237a31;
+  --link-hover-color: #cd191e;
+  --link-selected-fg: #1b5e26;
+
+  --button-bg: #2f9e41;
+  --button-fg: #ffffff;
+  --button-hover-bg: #237a31;
+  --default-button-bg: #237a31;
+  --default-button-hover-bg: #1b5e26;
+
+  --close-button-bg: #6b7770;
+  --close-button-hover-bg: #4d564f;
+
+  --delete-button-bg: #cd191e;
+  --delete-button-hover-bg: #a3141a;
+
+  --object-tools-bg: #cd191e;
+  --object-tools-fg: #ffffff;
+  --object-tools-hover-bg: #a3141a;
+
+  --selected-bg: #e8f6ec;
+  --selected-row: #f3fbf5;
+
+  --font-family-primary: 'Segoe UI', system-ui, Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Cabeçalho com gradiente institucional + faixa vermelha (igual ao site) */
+#header {
+  background: linear-gradient(135deg, #2f9e41 0%, #237a31 55%, #1b5e26 100%);
+  border-bottom: 3px solid #cd191e;
+  padding: 12px 40px;
+}
+
+/* Logotipo / marca no topo */
+.ifpb-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #fff;
+}
+
+.ifpb-brand__logo {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: #fff;
+  color: #2f9e41;
+  font-size: 1.15rem;
+  box-shadow: inset 0 0 0 3px #cd191e;
+}
+
+.ifpb-brand__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.ifpb-brand__text strong {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.ifpb-brand__text small {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  opacity: 0.85;
+}
+
+/* Botão "voltar ao site" no canto superior */
+#user-tools .ifpb-back-site,
+.ifpb-back-site {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff !important;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.ifpb-back-site:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Links e títulos */
+a:link,
+a:visited {
+  color: #237a31;
+}
+
+a:hover,
+a:focus {
+  color: #cd191e;
+}
+
+#content h1,
+.module h2,
+.module caption {
+  color: #1b5e26;
+}
+
+/* Cartões de módulo no dashboard */
+.module {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(20, 24, 26, 0.06);
+}
+
+div.module caption,
+.module h2 {
+  background: #237a31;
+  color: #fff;
+}
+
+/* Botões */
+.button,
+input[type=submit],
+input[type=button],
+.submit-row input {
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.button.default,
+input[type=submit].default,
+.submit-row input.default {
+  background: #2f9e41;
+}
+
+.button.default:hover,
+input[type=submit].default:hover {
+  background: #237a31;
+}
+
+/* Tabelas / linhas selecionadas */
+.row1 {
+  background: #ffffff;
+}
+
+tr.selected,
+.change-list .results tr.selected {
+  background: #e8f6ec;
+}
+
+#changelist-filter li.selected a {
+  color: #cd191e;
+}
+
+/* Caixa de login com cara institucional */
+body.login #header {
+  border-radius: 8px 8px 0 0;
+}
+
+body.login .submit-row input {
+  background: #2f9e41;
+}
+
+body.login #content {
+  border-top: 3px solid #cd191e;
+}
+
+/* Mensagens de sucesso/erro */
+ul.messagelist li.success {
+  background-color: #e8f6ec;
+  color: #1b5e26;
+}
+
+ul.messagelist li.error {
+  background-color: #fdecec;
+  color: #a3141a;
+}
+
+/* Links de objeto-tools (ex.: "Adicionar") em vermelho institucional */
+.object-tools a {
+  border-radius: 999px;
+}

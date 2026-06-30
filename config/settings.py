@@ -142,27 +142,54 @@ SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 SECURE_REFERRER_POLICY = 'same-origin'
 
+# Logs
+# Pasta onde os arquivos de log ficam gravados. Criamos automaticamente para
+# que a aplicação suba sem erro mesmo num clone novo do repositório (o conteúdo
+# *.log é ignorado pelo Git via .gitignore).
+LOGS_DIR = BASE_DIR / 'logs'
+LOGS_DIR.mkdir(exist_ok=True)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        # Formato simples e legível, igual para terminal e arquivo:
+        # 2026-06-28 14:32:10 | INFO | Login realizado | usuário=admin@...
+        'simple': {
+            'format': '{asctime} | {levelname} | {message}',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+            'style': '{',
+        },
+    },
     'handlers': {
+        # Saída no terminal durante o desenvolvimento.
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        # Persistência em logs/application.log para auditoria/depuração.
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': LOGS_DIR / 'application.log',
+            'encoding': 'utf-8',
+            'formatter': 'simple',
         },
     },
     'loggers': {
+        # Um logger por app, todos gravando no terminal E no arquivo. Como o
+        # nível é INFO, registramos INFO/WARNING/ERROR (e DEBUG fica de fora).
         'apps.accounts': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': 'INFO',
             'propagate': False,
         },
         'apps.rooms': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': 'INFO',
             'propagate': False,
         },
         'apps.reservations': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': 'INFO',
             'propagate': False,
         },

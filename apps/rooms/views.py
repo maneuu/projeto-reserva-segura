@@ -16,6 +16,7 @@ from django.views import View
 from django.views.generic import CreateView, UpdateView
 
 from apps.reservations.models import Reservation, ReservationStatus
+from apps.utils import mask_email
 
 from .forms import RoomForm, RoomSearchForm
 from .models import Room
@@ -230,14 +231,25 @@ class RoomCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
         # o salvamento em try/except para que uma eventual falha de banco vire
         # uma mensagem amigável, sem vazar o erro técnico (RNF04 / OWASP A05).
         try:
-            return super().form_valid(form)
+            response = super().form_valid(form)
         except DatabaseError:
+            logger.exception(
+                "Erro ao criar sala | usuário=%s",
+                mask_email(getattr(self.request.user, "email", None)),
+            )
             messages.error(
                 self.request,
                 "Não foi possível salvar a sala no momento. Tente novamente.",
             )
             # Re-renderiza o formulário (sem 500) para o usuário tentar de novo.
             return self.form_invalid(form)
+        else:
+            logger.info(
+                "Sala criada | sala=%s | usuário=%s",
+                self.object.name,
+                mask_email(getattr(self.request.user, "email", None)),
+            )
+            return response
 
 
 class RoomUpdateView(StaffRequiredMixin, SuccessMessageMixin, UpdateView):
@@ -263,13 +275,24 @@ class RoomUpdateView(StaffRequiredMixin, SuccessMessageMixin, UpdateView):
 
     def form_valid(self, form):
         try:
-            return super().form_valid(form)
+            response = super().form_valid(form)
         except DatabaseError:
+            logger.exception(
+                "Erro ao editar sala | usuário=%s",
+                mask_email(getattr(self.request.user, "email", None)),
+            )
             messages.error(
                 self.request,
                 "Não foi possível atualizar a sala no momento. Tente novamente.",
             )
             return self.form_invalid(form)
+        else:
+            logger.info(
+                "Sala editada | sala=%s | usuário=%s",
+                self.object.name,
+                mask_email(getattr(self.request.user, "email", None)),
+            )
+            return response
 
 
 class RoomToggleActiveView(StaffRequiredMixin, View):
@@ -291,12 +314,24 @@ class RoomToggleActiveView(StaffRequiredMixin, View):
             # e evita sobrescrever outros campos sem querer).
             room.save(update_fields=["is_active", "updated_at"])
         except DatabaseError:
+            logger.exception(
+                "Erro ao alterar status da sala | sala=%s | usuário=%s",
+                room.name,
+                mask_email(getattr(request.user, "email", None)),
+            )
             messages.error(
                 request,
                 "Não foi possível alterar o status da sala. Tente novamente.",
             )
         else:
             # Bloco 'else' do try roda só se NÃO houve exceção.
+            estado = "ativada" if room.is_active else "desativada"
+            logger.info(
+                "Sala %s | sala=%s | usuário=%s",
+                estado,
+                room.name,
+                mask_email(getattr(request.user, "email", None)),
+            )
             if room.is_active:
                 messages.success(request, f"Sala '{room.name}' ativada com sucesso.")
             else:

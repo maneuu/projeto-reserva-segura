@@ -6,6 +6,8 @@ from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
+from apps.utils import mask_email
+
 from .forms import LoginForm, RegisterForm
 
 
@@ -27,12 +29,12 @@ def login_view(request):
 			try:
 				user = authenticate(request, email=email, password=password)
 			except Exception:
-				logger.exception("Falha inesperada ao autenticar usuário: %s", email)
+				logger.exception("Falha inesperada ao autenticar usuário: %s", mask_email(email))
 				form.add_error(None, "Não foi possível acessar o sistema no momento.")
 			else:
 				if user is not None:
 					login(request, user)
-					logger.info("Login realizado com sucesso: %s", email)
+					logger.info("Login realizado com sucesso: %s", mask_email(email))
 
 					if next_url and url_has_allowed_host_and_scheme(
 						next_url,
@@ -42,7 +44,7 @@ def login_view(request):
 
 					return redirect("home")
 
-				logger.warning("Tentativa de login inválida: %s", email)
+				logger.warning("Tentativa de login inválida: %s", mask_email(email))
 				form.add_error(None, "Não foi possível entrar com as credenciais informadas.")
 
 	return render(
@@ -66,10 +68,10 @@ def register_view(request):
 			try:
 				user = form.save()
 			except Exception:
-				logger.exception("Falha inesperada ao cadastrar usuário: %s", form.cleaned_data.get("email"))
+				logger.exception("Falha inesperada ao cadastrar usuário: %s", mask_email(form.cleaned_data.get("email")))
 				form.add_error(None, "Não foi possível concluir o cadastro no momento.")
 			else:
-				logger.info("Usuário cadastrado com sucesso: %s", user.email)
+				logger.info("Usuário cadastrado com sucesso: %s", mask_email(user.email))
 				messages.success(request, "Cadastro realizado com sucesso. Faça login para continuar.")
 				return redirect("accounts:login")
 
@@ -78,6 +80,6 @@ def register_view(request):
 
 @require_POST
 def logout_view(request):
-	logger.info("Logout realizado: %s", getattr(request.user, "email", "desconhecido"))
+	logger.info("Logout realizado: %s", mask_email(getattr(request.user, "email", None)))
 	logout(request)
 	return redirect("accounts:login")

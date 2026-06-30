@@ -8,6 +8,7 @@ from apps.rooms.models import Room
 
 class ReservationStatus(models.TextChoices):
     ACTIVE = "ACTIVE", "Ativa"
+    EXPIRED = "EXPIRED", "Expirada"
     CANCELED = "CANCELED", "Cancelada"
 
 
@@ -60,6 +61,46 @@ class Reservation(models.Model):
         verbose_name = "Reserva"
         verbose_name_plural = "Reservas"
         ordering = ["-start_datetime"]
+
+    @property
+    def is_expired(self):
+        """True quando a reserva ainda está ATIVA mas o término já passou.
+
+        Serve como rede de segurança na exibição: mesmo que a tarefa de
+        expiração (``expire_overdue``) ainda não tenha rodado, o template já
+        consegue mostrar o estado correto.
+        """
+        return (
+            self.status == ReservationStatus.ACTIVE
+            and self.end_datetime is not None
+            and self.end_datetime < timezone.now()
+        )
+
+    @property
+    def effective_status(self):
+        """Status considerando a expiração em tempo real."""
+        if self.is_expired:
+            return ReservationStatus.EXPIRED
+        return self.status
+
+    def get_effective_status_display(self):
+        """Rótulo legível do status efetivo (ex.: 'Expirada')."""
+        return ReservationStatus(self.effective_status).label
+
+    @classmethod
+    def expire_overdue(cls):
+        """Marca como EXPIRED toda reserva ATIVA cujo término já passou.
+
+        Usa ``update`` em massa (uma única query, sem disparar ``save()``/
+        ``full_clean()``) porque é só uma transição de estado automática —
+        não há nada a validar. Retorna a quantidade de reservas expiradas.
+        Chamada ao listar/abrir reservas e também pelo comando de gestão
+        ``expire_reservations`` (para agendamento via cron, se desejado).
+        """
+        return cls.objects.filter(
+            status=ReservationStatus.ACTIVE,
+            end_datetime__lt=timezone.now(),
+        ).update(status=ReservationStatus.EXPIRED, updated_at=timezone.now())
 
     @classmethod
     def has_conflict(

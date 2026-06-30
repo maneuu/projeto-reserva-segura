@@ -1,0 +1,28 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Reserva Segura IFPB') }}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="{% static 'admin/css/ifpb-admin.css' %}">
+{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+  <a href="{% url 'admin:index' %}" class="ifpb-brand">
+    <span class="ifpb-brand__logo"><i class="fa-solid fa-building-columns"></i></span>
+    <span class="ifpb-brand__text">
+      <strong>Reserva Segura</strong>
+      <small>IFPB · Painel administrativo</small>
+    </span>
+  </a>
+</div>
+{% endblock %}
+
+{% block nav-global %}
+<a href="{% url 'home' %}" class="ifpb-back-site" title="Voltar ao site">
+  <i class="fa-solid fa-arrow-left"></i> Voltar ao site
+</a>
+{% endblock %}

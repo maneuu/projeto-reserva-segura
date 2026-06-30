@@ -23,6 +23,10 @@ def _can_manage_reservation(user, reservation):
 
 @login_required
 def reservation_list(request):
+	# Antes de listar, atualiza reservas vencidas (ATIVA -> EXPIRED) para que
+	# o status exibido reflita a realidade. É uma única query em massa.
+	Reservation.expire_overdue()
+
 	if request.user.is_staff or request.user.is_superuser:
 		reservations = Reservation.objects.select_related("room", "user").order_by("-start_datetime")
 	else:
@@ -128,6 +132,9 @@ def reservation_create(request, room_id=None):
 
 @login_required
 def reservation_detail(request, reservation_id):
+	# Garante que uma reserva já vencida apareça como "Expirada" ao abri-la.
+	Reservation.expire_overdue()
+
 	reservation = get_object_or_404(
 		Reservation.objects.select_related("room", "user"),
 		pk=reservation_id,

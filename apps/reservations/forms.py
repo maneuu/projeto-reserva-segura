@@ -3,7 +3,6 @@ import re
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.html import strip_tags
-from django.utils import timezone
 
 from apps.rooms.models import Room
 
@@ -44,12 +43,28 @@ class ReservationForm(forms.ModelForm):
     class Meta:
         model = Reservation
         fields = ["room", "start_datetime", "end_datetime", "description"]
+        # O seletor visual (calendário + relógio) é o flatpickr, inicializado no
+        # template sobre os campos com a classe 'js-flatpickr'. Mantemos o
+        # 'format' em ISO (%Y-%m-%dT%H:%M) para que, ao reexibir o formulário
+        # após um erro, o flatpickr consiga reler o valor; ao usuário, ele
+        # mostra a data em formato amigável (dd/mm/aaaa hh:mm) e ainda permite
+        # digitar ("colocar por escrito").
         widgets = {
             "start_datetime": forms.DateTimeInput(
-                attrs={"type": "datetime-local", "class": "input-control", "step": "300"}
+                format="%Y-%m-%dT%H:%M",
+                attrs={
+                    "class": "input-control js-flatpickr",
+                    "placeholder": "dd/mm/aaaa --:--",
+                    "autocomplete": "off",
+                },
             ),
             "end_datetime": forms.DateTimeInput(
-                attrs={"type": "datetime-local", "class": "input-control", "step": "300"}
+                format="%Y-%m-%dT%H:%M",
+                attrs={
+                    "class": "input-control js-flatpickr",
+                    "placeholder": "dd/mm/aaaa --:--",
+                    "autocomplete": "off",
+                },
             ),
         }
 
@@ -60,10 +75,6 @@ class ReservationForm(forms.ModelForm):
         self.fields["start_datetime"].input_formats = ["%Y-%m-%dT%H:%M"]
         self.fields["end_datetime"].input_formats = ["%Y-%m-%dT%H:%M"]
         self.fields["room"].widget.attrs["class"] = "input-control"
-
-        min_datetime_value = timezone.localtime(timezone.now()).strftime("%Y-%m-%dT%H:%M")
-        self.fields["start_datetime"].widget.attrs["min"] = min_datetime_value
-        self.fields["end_datetime"].widget.attrs["min"] = min_datetime_value
 
         if selected_room is not None:
             self.fields["room"].queryset = Room.objects.filter(pk=selected_room.pk)

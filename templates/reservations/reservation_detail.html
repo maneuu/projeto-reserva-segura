@@ -1,53 +1,47 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detalhes da Reserva</title>
-  <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}">
-</head>
+{% block title %}Detalhes da reserva | Reserva Segura IFPB{% endblock %}
 
-<body>
-  <main class="auth-card wide">
-    <div class="page-header">
-      <div>
-        <h1 class="auth-title">Detalhes da reserva</h1>
-        <p class="auth-subtitle">Consulte os dados e, se necessário, cancele a reserva.</p>
-      </div>
+{% block main_class %}site-main--narrow{% endblock %}
 
-      <nav class="page-links" aria-label="Navegação">
-        <a class="page-link" href="{% url 'home' %}">Home</a>
-        <a class="page-link" href="{% url 'reservations:reservation_list' %}">Minhas reservas</a>
-      </nav>
-    </div>
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow"><i class="fa-solid fa-calendar-check"></i> Reserva</p>
+    <h1>Detalhes da reserva</h1>
+    <p class="subtitle">Consulte os dados e, se necessário, cancele a reserva.</p>
+  </div>
+</div>
 
-    {% if messages %}
-    {% for message in messages %}
-    <div class="info-banner">{{ message }}</div>
-    {% endfor %}
+<section class="panel">
+  <div class="data-item__title data-item__title--spaced">
+    <i class="fa-solid fa-door-closed"></i> {{ reservation.room.name }}
+    {% if reservation.status == 'ACTIVE' %}
+    <span class="badge badge-available">{{ reservation.get_status_display }}</span>
+    {% elif reservation.status == 'EXPIRED' %}
+    <span class="badge badge-expired"><i class="fa-solid fa-clock-rotate-left"></i> {{ reservation.get_status_display }}</span>
+    {% else %}
+    <span class="badge badge-unavailable">{{ reservation.get_status_display }}</span>
     {% endif %}
+  </div>
 
-    <section class="reservation-item reservation-detail-panel">
-      <p><strong>Sala:</strong> {{ reservation.room.name }}</p>
-      <p><strong>Usuário:</strong> {{ reservation.user.get_full_name|default:reservation.user.username }}</p>
-      <p><strong>Início:</strong> {{ reservation.start_datetime|date:"d/m/Y H:i" }}</p>
-      <p><strong>Término:</strong> {{ reservation.end_datetime|date:"d/m/Y H:i" }}</p>
-      <p><strong>Status:</strong> {{ reservation.get_status_display }}</p>
-    </section>
-
+  <div class="detail-rows">
+    <div class="row"><span class="label"><i class="fa-solid fa-user"></i> Usuário</span><span class="value">{{ reservation.user.get_full_name|default:reservation.user.email }}</span></div>
+    <div class="row"><span class="label"><i class="fa-solid fa-hourglass-start"></i> Início</span><span class="value">{{ reservation.start_datetime|date:"d/m/Y H:i" }}</span></div>
+    <div class="row"><span class="label"><i class="fa-solid fa-hourglass-end"></i> Término</span><span class="value">{{ reservation.end_datetime|date:"d/m/Y H:i" }}</span></div>
     {% if reservation.description %}
-    <p class="reservation-meta"><strong>Descrição:</strong> {{ reservation.description }}</p>
+    <div class="row"><span class="label"><i class="fa-solid fa-align-left"></i> Descrição</span><span class="value">{{ reservation.description }}</span></div>
     {% endif %}
+  </div>
 
+  <div class="data-actions">
+    <a class="btn btn-secondary" href="{% url 'reservations:reservation_list' %}"><i class="fa-solid fa-arrow-left"></i> Minhas reservas</a>
     {% if can_cancel and reservation.status == 'ACTIVE' %}
-    <form method="post" action="{% url 'reservations:reservation_cancel' reservation.id %}" class="reservation-actions">
+    <form method="post" action="{% url 'reservations:reservation_cancel' reservation.id %}">
       {% csrf_token %}
-      <button type="submit" class="submit-btn submit-btn-small">Cancelar reserva</button>
+      <button type="submit" class="btn btn-danger"><i class="fa-solid fa-xmark"></i> Cancelar reserva</button>
     </form>
     {% endif %}
-  </main>
-</body>
-
-</html>
+  </div>
+</section>
+{% endblock %}
